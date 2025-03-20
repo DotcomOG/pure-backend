@@ -70,6 +70,7 @@ function normalizeUrl(url) {
 
 /**
  * Analyze HTML using Cheerio and return metrics.
+ * (Defined only once, no duplicates.)
  */
 function analyzeHtml(html) {
   const $ = load(html);
