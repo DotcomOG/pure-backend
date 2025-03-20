@@ -8,20 +8,14 @@ app.use(cors());
 const PORT = process.env.PORT || 8080;
 
 app.get('/', async (req, res) => {
-  // Retrieve the "url" query parameter
   const url = req.query.url;
-
-  // If no "url" is provided, respond with a helpful message
   if (!url) {
     return res.json({ message: 'Please provide a ?url= parameter' });
   }
 
   try {
-    // Fetch the external URL's content
     const response = await fetch(url);
     const body = await response.text();
-
-    // Extract the title and meta description if available
     const titleMatch = body.match(/<title>(.*?)<\/title>/);
     const descriptionMatch = body.match(/<meta name="description" content="(.*?)">/);
 
