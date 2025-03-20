@@ -21,18 +21,16 @@ function normalizeUrl(url) {
 }
 
 /**
- * We'll remove any random scoring and just pick a fixed score of 7 out of 10,
- * or you can change the number here if you want a different default.
+ * We’ll keep a fixed SEO score of 7/10 for demonstration.
  */
 function getFixedSeoScore() {
-  return 7; // Always 7/10 for demonstration
+  return 7; 
 }
 
 /**
  * Exactly 10 "good" points.
  */
 function getGoodPoints() {
-  // 14 possible “good” points
   const pool = [
     "Responsive mobile design",
     "Fast page load speed",
@@ -57,7 +55,6 @@ function getGoodPoints() {
  * Exactly 20 "needed to be addressed" points.
  */
 function getBadPoints() {
-  // 24 possible “bad” points
   const pool = [
     "Missing meta descriptions on some pages",
     "Overly long or duplicated title tags",
@@ -90,12 +87,15 @@ function getBadPoints() {
 
 /**
  * Generate up to 10 "detailed" items from the "bad" points for the final report.
+ * Adds extra line breaks for readability.
  */
 function generateDetailedExplanations(badPoints) {
-  // We'll limit to 10 for the final report
   return badPoints.slice(0, 10).map((pt, idx) => {
-    return `🔎 Detailed #${idx + 1}: ${pt} — This issue requires more attention to improve SEO & user experience.`;
-  });
+    return `
+      🔎 <strong>Detailed #${idx + 1}:</strong> ${pt} — This issue requires more attention to improve SEO & user experience.
+      <br><br>
+    `;
+  }).join("");
 }
 
 /**
@@ -108,7 +108,7 @@ function buildHtmlResponse(url, score, goodPoints, badPoints) {
   // Convert "bad" points into bullet list
   const badList = badPoints.map(pt => `<li>⚠️ ${pt}</li>`).join("");
 
-  // Explanation text for the score (we can keep it simple)
+  // Explanation text for the score
   const explanationText = `
     This SEO score is a fixed demonstration score of ${score}/10. 
     In a real scenario, you'd calculate it based on site speed, mobile-friendliness, 
@@ -226,6 +226,19 @@ function buildHtmlResponse(url, score, goodPoints, badPoints) {
             font-weight: bold;
             text-align: center;
           }
+          .calendly {
+            margin-top: 20px;
+            padding: 10px;
+            background: #eaf7ea;
+            border-radius: 6px;
+          }
+          .calendly a {
+            color: #007BFF;
+            text-decoration: none;
+          }
+          .calendly a:hover {
+            text-decoration: underline;
+          }
         </style>
       </head>
       <body>
@@ -261,8 +274,15 @@ function buildHtmlResponse(url, score, goodPoints, badPoints) {
           </div>
 
           <div class="detailed-report hidden" id="detailedReportSection">
-            <h2>Detailed Explanations (up to 10 items to address)</h2>
+            <h2>Detailed Report</h2>
             <ul id="detailedList"></ul>
+            <div class="calendly">
+              Need more help with AI marketing?  
+              <a href="https://calendly.com/theyoramezra" target="_blank">
+                Schedule a call
+              </a>
+              and let’s discuss your site’s strategy!
+            </div>
           </div>
         </div>
 
@@ -277,7 +297,7 @@ function buildHtmlResponse(url, score, goodPoints, badPoints) {
 
         <!-- We'll embed the badPoints as JSON for the final report. -->
         <script id="badPointsJson" type="application/json">
-          ${JSON.stringify(badPoints)}
+          ${JSON.stringify(getBadPoints())}
         </script>
 
         <script>
@@ -302,11 +322,15 @@ function buildHtmlResponse(url, score, goodPoints, badPoints) {
             overlay.style.display = 'none';
           });
 
-          // Generate the final 10 detailed items from the badPoints
+          // Generate final 10 detailed items from the "bad" points
           function generateDetailedExplanations(points) {
-            const limited = points.slice(0, 10);
-            return limited.map((pt, idx) => {
-              return \`<li>🔎 Detailed #\${idx+1}: \${pt} — This issue requires more attention to improve SEO & user experience.</li>\`;
+            return points.slice(0, 10).map((pt, idx) => {
+              return \`
+                <li>
+                  🔎 <strong>Detailed #\${idx + 1}:</strong> \${pt} — This issue requires more attention to improve SEO & user experience.
+                  <br><br>
+                </li>
+              \`;
             }).join("");
           }
 
@@ -316,7 +340,7 @@ function buildHtmlResponse(url, score, goodPoints, badPoints) {
               alert("Name and Email are required.");
               return;
             }
-            // Hide the initialSections
+            // Hide the initial sections
             initialSections.style.display = 'none';
 
             // Show the detailed section
@@ -337,12 +361,13 @@ function buildHtmlResponse(url, score, goodPoints, badPoints) {
 
 /**
  * GET /friendly?url=example.com
- * Returns an HTML page with:
- *  - a fixed SEO score of 7/10
- *  - EXACTLY 10 “good” bullet points
- *  - EXACTLY 20 “needed to be addressed” bullet points
- *  - a form for name/email/company
- *  - once user enters name & email, hides the initial lists and shows up to 10 detailed items
+ * - A fixed SEO score of 7/10
+ * - EXACTLY 10 “good” bullet points
+ * - EXACTLY 20 “needed to be addressed” bullet points
+ * - A form for name/email/company
+ * - Once user enters name & email, hides the initial lists & shows 10 detailed items
+ * - Additional line breaks in the detailed items
+ * - Calendly link in the final report section
  */
 app.get('/friendly', async (req, res) => {
   const targetUrl = req.query.url;
@@ -374,7 +399,6 @@ app.get('/friendly', async (req, res) => {
 
 /**
  * (Optional) POST /report
- * Accepts JSON with { url, name, email, company } if needed for more logic
  */
 app.post('/report', async (req, res) => {
   const { url, name, email, company } = req.body;
