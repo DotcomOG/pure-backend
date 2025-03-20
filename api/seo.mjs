@@ -7,26 +7,26 @@ app.use(cors());
 
 const PORT = process.env.PORT || 8080;
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok' });
-});
-
-// Main route to fetch SEO data at the root URL
+// Root route expects a ?url= parameter
 app.get('/', async (req, res) => {
-  const url = req.query.url;
-  if (!url) {
+  const targetUrl = req.query.url;
+
+  // If no URL is provided, return a helpful message
+  if (!targetUrl) {
     return res.json({ message: 'Please provide a ?url= parameter' });
   }
 
   try {
-    const response = await fetch(url);
+    // Fetch the external URL's content
+    const response = await fetch(targetUrl);
     const body = await response.text();
+
+    // Attempt to extract <title> and meta description
     const titleMatch = body.match(/<title>(.*?)<\/title>/);
     const descriptionMatch = body.match(/<meta name="description" content="(.*?)">/);
 
     const pageContent = {
-      url: url,
+      url: targetUrl,
       title: titleMatch ? titleMatch[1] : 'No Title Found',
       description: descriptionMatch ? descriptionMatch[1] : 'No Description Found',
       userIntent: {
@@ -39,10 +39,13 @@ app.get('/', async (req, res) => {
 
     res.json(pageContent);
   } catch (error) {
+    // Log the error to Railway logs for debugging
+    console.error('Error fetching URL:', error);
     res.status(500).send('Error retrieving content from the provided URL');
   }
 });
 
+// Start the server on port 8080 or assigned PORT
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on port ${PORT}`);
 });
