@@ -7,6 +7,12 @@ app.use(cors());
 
 const PORT = process.env.PORT || 8080;
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok' });
+});
+
+// Main route to fetch SEO data at the root URL
 app.get('/', async (req, res) => {
   const url = req.query.url;
   if (!url) {
