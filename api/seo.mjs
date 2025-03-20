@@ -21,18 +21,19 @@ function normalizeUrl(url) {
 }
 
 /**
- * Generate a random SEO score between 0 and 10.
- * (Replace with your actual scoring logic later.)
+ * We'll remove any random scoring and just pick a fixed score of 7 out of 10,
+ * or you can change the number here if you want a different default.
  */
-function getRandomSeoScore() {
-  return Math.floor(Math.random() * 11); // Score from 0 to 10
+function getFixedSeoScore() {
+  return 7; // Always 7/10 for demonstration
 }
 
 /**
- * Generate up to 10 "good" points (OK with website).
+ * Exactly 10 "good" points.
  */
-function generateGoodPoints() {
-  const goodPointsPool = [
+function getGoodPoints() {
+  // 14 possible “good” points
+  const pool = [
     "Responsive mobile design",
     "Fast page load speed",
     "Well-structured content hierarchy",
@@ -48,17 +49,16 @@ function generateGoodPoints() {
     "Accessible color contrast",
     "Social media integration"
   ];
-  // Randomly pick a number up to 10
-  const count = Math.floor(Math.random() * 10) + 1; // 1 to 10
-  // Shuffle and pick 'count' items
-  return goodPointsPool.sort(() => 0.5 - Math.random()).slice(0, count);
+  // Force exactly 10 from the top
+  return pool.slice(0, 10);
 }
 
 /**
- * Generate up to 20 "needed to be addressed" points (bad or suboptimal).
+ * Exactly 20 "needed to be addressed" points.
  */
-function generateBadPoints() {
-  const badPointsPool = [
+function getBadPoints() {
+  // 24 possible “bad” points
+  const pool = [
     "Missing meta descriptions on some pages",
     "Overly long or duplicated title tags",
     "Slow server response time",
@@ -84,28 +84,22 @@ function generateBadPoints() {
     "Low domain authority from few backlinks",
     "Outdated or irrelevant content"
   ];
-  // Randomly pick a number up to 20
-  const count = Math.floor(Math.random() * 20) + 1; // 1 to 20
-  // Shuffle and pick 'count' items
-  return badPointsPool.sort(() => 0.5 - Math.random()).slice(0, count);
+  // Force exactly 20 from the top
+  return pool.slice(0, 20);
 }
 
 /**
- * Generate a more "detailed" explanation for each bad point for the full report.
+ * Generate up to 10 "detailed" items from the "bad" points for the final report.
  */
 function generateDetailedExplanations(badPoints) {
-  // For demonstration, we'll just add some extra text to each bad point.
-  return badPoints.slice(0, 10).map((point, idx) => {
-    return `Detailed Explanation #${idx + 1}: ${point} — This issue requires additional focus. Addressing it can significantly improve SEO and user experience.`;
+  // We'll limit to 10 for the final report
+  return badPoints.slice(0, 10).map((pt, idx) => {
+    return `🔎 Detailed #${idx + 1}: ${pt} — This issue requires more attention to improve SEO & user experience.`;
   });
 }
 
 /**
  * Build the user-friendly HTML page.
- *  - Up to 10 good points
- *  - Up to 20 bad points
- *  - A form for name, email, company, plus a "Get Full Report" button
- *  - JavaScript that hides the good points and replaces the bullet list with a "long form" of up to 10 items once user provides name/email
  */
 function buildHtmlResponse(url, score, goodPoints, badPoints) {
   // Convert "good" points into bullet list
@@ -113,6 +107,13 @@ function buildHtmlResponse(url, score, goodPoints, badPoints) {
 
   // Convert "bad" points into bullet list
   const badList = badPoints.map(pt => `<li>⚠️ ${pt}</li>`).join("");
+
+  // Explanation text for the score (we can keep it simple)
+  const explanationText = `
+    This SEO score is a fixed demonstration score of ${score}/10. 
+    In a real scenario, you'd calculate it based on site speed, mobile-friendliness, 
+    meta data, content quality, backlinks, etc.
+  `;
 
   return `
     <!DOCTYPE html>
@@ -178,20 +179,70 @@ function buildHtmlResponse(url, score, goodPoints, badPoints) {
             margin: 10px 0;
             padding-left: 20px;
           }
+          .lightboxOverlay {
+            display: none;
+            position: fixed;
+            top: 0; 
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+          }
+          .lightboxContent {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 80%;
+          }
+          .closeLightbox {
+            float: right;
+            cursor: pointer;
+            color: #007BFF;
+            font-weight: bold;
+          }
+          .closeLightbox:hover {
+            text-decoration: underline;
+          }
+          .score-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+          }
+          .question-mark {
+            background: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-weight: bold;
+            text-align: center;
+          }
         </style>
       </head>
       <body>
         <div class="container">
           <h1>AI SEO Analysis 🔎</h1>
           <p>URL inspected: <strong>${url}</strong></p>
-          <p>Score: <span class="score">${score}/10</span></p>
-
+          <div class="score-container">
+            <p>Score: <span class="score">${score}/10</span></p>
+            <button class="question-mark" id="openLightbox">?</button>
+          </div>
+          
           <div class="sections" id="initialSections">
-            <h2>What's OK (up to 10)</h2>
+            <h2>What's OK (exactly 10)</h2>
             <ul id="goodPoints">
               ${goodList}
             </ul>
-            <h2>Needs to be addressed (up to 20)</h2>
+            <h2>Needs to be addressed (exactly 20)</h2>
             <ul id="badPoints">
               ${badList}
             </ul>
@@ -215,6 +266,20 @@ function buildHtmlResponse(url, score, goodPoints, badPoints) {
           </div>
         </div>
 
+        <!-- Lightbox Overlay for score explanation -->
+        <div class="lightboxOverlay" id="lightboxOverlay">
+          <div class="lightboxContent" id="lightboxContent">
+            <span class="closeLightbox" id="closeLightbox">Close ✖</span>
+            <h2>Scoring Explanation</h2>
+            <p>${explanationText}</p>
+          </div>
+        </div>
+
+        <!-- We'll embed the badPoints as JSON for the final report. -->
+        <script id="badPointsJson" type="application/json">
+          ${JSON.stringify(badPoints)}
+        </script>
+
         <script>
           const getReportBtn = document.getElementById('getReportBtn');
           const userName = document.getElementById('userName');
@@ -225,22 +290,20 @@ function buildHtmlResponse(url, score, goodPoints, badPoints) {
           const detailedReportSection = document.getElementById('detailedReportSection');
           const detailedList = document.getElementById('detailedList');
 
-          // We embedded the "bad points" in the page so we can show them in detail
-          // after user provides name & email. We'll store them in a data attribute for simplicity.
-          // We'll parse them from the existing <ul id="badPoints"> content, or we can embed them as JSON.
+          const overlay = document.getElementById('lightboxOverlay');
+          const closeBtn = document.getElementById('closeLightbox');
+          const openBtn = document.getElementById('openLightbox');
 
-          // For a simpler approach, let's embed them in a hidden JSON script:
-        </script>
+          // Show/hide lightbox
+          openBtn.addEventListener('click', () => {
+            overlay.style.display = 'block';
+          });
+          closeBtn.addEventListener('click', () => {
+            overlay.style.display = 'none';
+          });
 
-        <!-- We'll embed a JSON with the bad points for detailed explanation. -->
-        <script id="badPointsJson" type="application/json">
-          ${JSON.stringify(badPoints)}
-        </script>
-
-        <script>
-          // We'll generate a detailed explanation for each bad point once user submits the form
+          // Generate the final 10 detailed items from the badPoints
           function generateDetailedExplanations(points) {
-            // We'll limit to 10
             const limited = points.slice(0, 10);
             return limited.map((pt, idx) => {
               return \`<li>🔎 Detailed #\${idx+1}: \${pt} — This issue requires more attention to improve SEO & user experience.</li>\`;
@@ -253,7 +316,7 @@ function buildHtmlResponse(url, score, goodPoints, badPoints) {
               alert("Name and Email are required.");
               return;
             }
-            // Hide the "good points" & "bad points" from initialSections
+            // Hide the initialSections
             initialSections.style.display = 'none';
 
             // Show the detailed section
@@ -275,10 +338,11 @@ function buildHtmlResponse(url, score, goodPoints, badPoints) {
 /**
  * GET /friendly?url=example.com
  * Returns an HTML page with:
- *  - random SEO score
- *  - up to 10 "good" bullet points
- *  - up to 20 "bad" bullet points
- *  - a form that, when user enters name/email, hides good points & shows a "long form" for up to 10 items to address
+ *  - a fixed SEO score of 7/10
+ *  - EXACTLY 10 “good” bullet points
+ *  - EXACTLY 20 “needed to be addressed” bullet points
+ *  - a form for name/email/company
+ *  - once user enters name & email, hides the initial lists and shows up to 10 detailed items
  */
 app.get('/friendly', async (req, res) => {
   const targetUrl = req.query.url;
@@ -293,9 +357,12 @@ app.get('/friendly', async (req, res) => {
     const response = await fetch(normalizedUrl);
     await response.text();
 
-    const score = getRandomSeoScore();
-    const goodPoints = generateGoodPoints();
-    const badPoints = generateBadPoints();
+    // Use fixed score of 7
+    const score = getFixedSeoScore();
+
+    // EXACT 10 good points, EXACT 20 bad points
+    const goodPoints = getGoodPoints();
+    const badPoints = getBadPoints();
 
     const htmlContent = buildHtmlResponse(normalizedUrl, score, goodPoints, badPoints);
     res.status(200).send(htmlContent);
@@ -307,7 +374,7 @@ app.get('/friendly', async (req, res) => {
 
 /**
  * (Optional) POST /report
- * Accepts JSON with { url, name, email, company } if needed for further logic
+ * Accepts JSON with { url, name, email, company } if needed for more logic
  */
 app.post('/report', async (req, res) => {
   const { url, name, email, company } = req.body;
