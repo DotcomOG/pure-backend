@@ -1,0 +1,10 @@
+{
+  "rootDir": ".",
+  "services": [
+    {
+      "name": "ai-seo-backend",
+      "command": "npm start",
+      "port": "8080"
+    }
+  ]
+}
