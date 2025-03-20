@@ -1,0 +1,93 @@
+<!-- Secured admin.html with basic password authentication -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SnipeRank Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Nunito Sans', sans-serif; padding: 20px; background: #f0f4f8; }
+    .container { max-width: 700px; margin: auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+    h1 { text-align: center; }
+    input[type="password"] { padding: 10px; width: 100%; box-sizing: border-box; }
+    button { padding: 10px; cursor: pointer; }
+    .report-item { padding: 10px; border-bottom: 1px solid #ccc; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>SnipeRank Admin Dashboard</h1>
+  
+  <div id="login-section">
+    <input type="password" id="adminPassword" placeholder="Enter Admin Password">
+    <button onclick="verifyPassword()">Login</button>
+  </div>
+
+  <div id="report-section" style="display:none;">
+    <h2>Submitted Reports:</h2>
+    <div id="reports-container">Loading...</div>
+  </div>
+</div>
+
+<!-- Firebase and Firestore setup -->
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js';
+  import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js';
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBDSiVrtYRrDWTFCrbsZh1ud9ih_VJ1wgI",
+    authDomain: "ai-seo-analyser.firebaseapp.com",
+    projectId: "ai-seo-analyser",
+    storageBucket: "ai-seo-analyser.firebasestorage.app",
+    messagingSenderId: "137290326304",
+    appId: "1:137290326304:web:cd50abaa0c0775e78eb745"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Fetch reports from Firestore and display them
+  window.fetchReports = async () => {
+    const reportsSnapshot = await getDocs(collection(db, "reports"));
+    const reports = reportsSnapshot.docs.map(doc => doc.data());
+
+    const container = document.getElementById('reports-container');
+    if (reports.length === 0) {
+      container.innerHTML = "No reports found.";
+      return;
+    }
+
+    container.innerHTML = reports.map(report => `
+      <div class="report-item">
+        <strong>Name:</strong> ${report.user.name}<br>
+        <strong>Email:</strong> ${report.user.email}<br>
+        <strong>Company:</strong> ${report.user.company || 'N/A'}<br>
+        <strong>Position:</strong> ${report.user.position || 'N/A'}<br>
+        <strong>Phone:</strong> ${report.user.phone || 'N/A'}<br>
+        <strong>Best Time:</strong> ${report.user.bestTime || 'N/A'}<br>
+        <strong>Website URL:</strong> ${report.user.websiteURL || 'N/A'}<br>
+        <strong>Submitted on:</strong> ${report.timestamp ? new Date(report.timestamp.seconds * 1000).toLocaleString() : 'N/A'}
+      </div>
+    `).join('');
+  };
+</script>
+
+<script>
+  // Password verification (basic but sufficient for now)
+  function verifyPassword() {
+    const enteredPassword = document.getElementById('adminPassword').value;
+    const correctPassword = "YourSecureAdminPasswordHere"; // SET YOUR PASSWORD HERE CLEARLY
+
+    if (enteredPassword === correctPassword) {
+      document.getElementById('login-section').style.display = 'none';
+      document.getElementById('report-section').style.display = 'block';
+      window.fetchReports();
+    } else {
+      alert('Incorrect password, please try again.');
+    }
+  }
+</script>
+
+</body>
+</html>

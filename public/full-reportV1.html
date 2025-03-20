@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SnipeRank Detailed SEO Report</title>
+  <link href="https://fonts.googleapis.com/css2?family=Forum&family=Nunito+Sans:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Nunito Sans', sans-serif; background: #f9f9f9; margin: 0; padding: 0; }
+    header { text-align: center; padding: 15px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    header h2 { font-family: 'Forum', serif; margin: 5px 0; }
+    nav a { margin: 0 10px; text-decoration: none; font-weight: 600; color: #000; }
+    .container { max-width: 700px; margin: 30px auto; background: #fff; padding: 20px 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    h1, h2 { font-family: 'Forum', serif; color: #333; }
+    ul { padding-left:0; }
+    li { margin-bottom:10px; }
+    .title { font-weight:bold; }
+    .explanation { font-size:0.9em; color:#666; }
+  </style>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js';
+    import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBDSiVrtYRrDWTFCrbsZh1ud9ih_VJ1wgI",
+      authDomain: "ai-seo-analyser.firebaseapp.com",
+      projectId: "ai-seo-analyser",
+      storageBucket: "ai-seo-analyser.firebasestorage.app",
+      messagingSenderId: "137290326304",
+      appId: "1:137290326304:web:cd50abaa0c0775e78eb745",
+      measurementId: "G-Z1EP67F84G"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.submitContactForm = async (userData, reportData) => {
+      try {
+        await addDoc(collection(db, "reports"), {
+          user: userData,
+          report: reportData,
+          timestamp: serverTimestamp()
+        });
+        alert('Your report has been successfully saved! I will reach out shortly.');
+      } catch (e) {
+        console.error("Error saving report:", e);
+        alert('There was a problem saving your report. Please try again.');
+      }
+    };
+  </script>
+</head>
+<body>
+<header>
+  <h2>Yoram Ezra Strategies</h2>
+  <nav>
+    <a href="https://www.yoramezra.com/">Home</a>
+    AI SEO Analyzer
+  </nav>
+</header>
+
+<div class="container">
+  <h1 style="text-align:center;">
+    SnipeRank Detailed AI SEO Analysis<br>
+    <small style="font-size:0.7em;">🤖 Powered by ChatGPT 🤖</small>
+  </h1>
+  <p style="text-align:center;">URL inspected: <strong id="inspected-url">Analyzing...</strong></p>
+
+  <div id="full-report-content">
+    <h2>Site Superpowers (SEO Strengths)</h2>
+    <ul id="superpowers-list"><li>SnipeRank is scanning and analying the site.<br>Loading...</li></ul>
+
+    <h2>SEO Opportunities (Improvements Needed)</h2>
+    <ul id="opportunities-list"><li>Loading...</li></ul>
+
+    <h2>Detailed AI Engine Insights</h2>
+    <ul id="engine-insights-list"><li>Loading...</li></ul>
+  </div>
+
+  <!-- Contact Me Form -->
+  <div id="contact-form" style="margin-top:30px;text-align:center;">
+    <h3>Contact Me</h3>
+    <input id="userName" type="text" placeholder="Your Name*" required style="width:80%;padding:10px;margin:5px;">
+    <input id="userEmail" type="email" placeholder="Your Email*" required style="width:80%;padding:10px;margin:5px;">
+    <input id="userCompany" type="text" placeholder="Company (optional)" style="width:80%;padding:10px;margin:5px;"><br>
+    <button id="submitReportBtn" style="padding:10px 20px;margin-top:10px;cursor:pointer;">Send Report & Contact Me</button>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const url = new URLSearchParams(window.location.search).get("url") || "https://example.com";
+  document.getElementById("inspected-url").textContent = url;
+
+  const fetchReport = () => {
+    fetch(`/friendly?url=${encodeURIComponent(url)}&detail=full`)
+      .then(res => res.status === 202 ? (setTimeout(fetchReport,3000), null) : res.json())
+      .then(data => {
+        if (!data) return;
+        const renderList = (id, items, emoji) => {
+          document.getElementById(id).innerHTML = items.map(i => `
+            <li><div class="title">${emoji} ${i.title}</div><div class="explanation">${i.explanation}</div></li>
+          `).join('');
+        };
+        renderList("superpowers-list", data.ai_superpowers, "✅");
+        renderList("opportunities-list", data.ai_opportunities, "🚨");
+        renderList("engine-insights-list", Object.entries(data.ai_engine_insights).map(([title, explanation]) => ({ title, explanation })), "🤖");
+      }).catch(console.error);
+  };
+
+  fetchReport();
+
+  document.getElementById('submitReportBtn').onclick = async () => {
+    const userData = {
+      name: document.getElementById('userName').value.trim(),
+      email: document.getElementById('userEmail').value.trim(),
+      company: document.getElementById('userCompany').value.trim() || 'Not Provided'
+    };
+
+    if (!userData.name || !userData.email) {
+      alert('Please fill out your name and email.');
+      return;
+    }
+
+    const reportData = {
+      url: url,
+      content: document.getElementById('full-report-content').innerHTML
+    };
+
+    await window.submitContactForm(userData, reportData);
+  };
+});
+</script>
+</body>
+</html>

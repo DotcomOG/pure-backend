@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>SnipeRank SEO Summary Report</title>
+  <link href="https://fonts.googleapis.com/css2?family=Forum&family=Nunito+Sans:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    /* Styles are unchanged, kept as provided in your last upload */
+    body { font-family:'Nunito Sans',sans-serif;background:#f9f9f9;margin:0;padding:0; }
+    header { text-align:center;padding:15px;background:#fff;box-shadow:0 2px 5px rgba(0,0,0,0.1); }
+    .container { max-width:700px;margin:30px auto;background:#fff;padding:20px;border-radius:8px;box-shadow:0 2px 5px rgba(0,0,0,0.1); }
+    h1,h2 { font-family:'Forum',serif;color:#333;text-align:center; }
+    .score-container { display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px;margin-top:10px; }
+    .info-icon { cursor:pointer;font-weight:bold;background:#007BFF;color:#fff;padding:3px 8px;border-radius:50%;font-size:12px; }
+    .score-indicator { width:50%;height:20px;background:linear-gradient(to right,red,yellow,green);position:relative;border-radius:10px;overflow:hidden; }
+    .score-marker { width:2px;height:100%;position:absolute;background:#000;animation:bounce 2s infinite ease-in-out; }
+    .score-percentage { position:absolute;width:100%;text-align:center;line-height:20px;font-size:0.9em;color:#000; }
+    @keyframes bounce {0%,100%{left:0%;}50%{left:100%;}}
+    ul {padding:0;} li {margin-bottom:10px;list-style:none;}
+    .title {font-weight:bold;} .explanation {font-size:0.9em;color:#555;}
+    .form-container {width:75%;margin:auto;text-align:center;}
+    .form-row {display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:10px;}
+    input {padding:8px;flex:1;min-width:150px;} button {padding:10px 20px;cursor:pointer;}
+    #url-lightbox, #score-lightbox {position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:flex;justify-content:center;align-items:center;z-index:20000;}
+    .lightbox-content {background:white;padding:25px;border-radius:10px;text-align:center;position:relative;}
+    #score-lightbox {display:none; z-index:25000;}
+  </style>
+</head>
+
+<body>
+
+<!-- URL Entry Lightbox -->
+<div id="url-lightbox">
+  <div class="lightbox-content">
+    <input type="text" id="urlInput" placeholder="Enter website URL" required>
+    <button id="analyzeButton">Analyze</button>
+  </div>
+</div>
+
+<header><h2>Yoram Ezra Strategies</h2></header>
+
+<div class="container">
+  <h1>SnipeRank AI-SEO Analyzer<br>Summary Report</h1>
+  <p>URL inspected: <strong id="inspected-url">Waiting for URL...</strong></p>
+  <p id="waiting-message">ChatGPT is scanning the website in real time.<br>This can take up to a minute.</p>
+
+  <div class="score-container">
+    <span class="info-icon" id="scoreInfo">?</span>
+    <div>AI SEO Score:</div>
+    <div class="score-indicator">
+      <div id="score-marker" class="score-marker"></div>
+      <span class="score-percentage" id="score-percentage">Loading...</span>
+    </div>
+  </div>
+
+  <h2>Site Superpowers (SEO Strengths)</h2><ul id="superpowers-list"></ul>
+  <h2>SEO Opportunities (Improvements Needed)</h2><ul id="opportunities-list"></ul>
+  <h2>Detailed AI Engine Insights</h2><ul id="engine-insights-list"></ul>
+
+  <div class="form-container">
+    <form id="summaryForm">
+      <input type="hidden" id="hidden-url" value="">
+      <div class="form-row">
+        <input type="text" name="name" placeholder="Your Name*" required>
+        <input type="email" name="email" placeholder="Your Email*" required>
+      </div>
+      <div class="form-row">
+        <input type="text" name="company" placeholder="Company/Organization (optional)">
+      </div>
+      <button type="submit">Get Full Report</button>
+    </form>
+  </div>
+</div>
+
+<!-- Score Explanation Lightbox -->
+<div id="score-lightbox">
+  <div class="lightbox-content">
+    <span id="score-lightbox-close" style="cursor:pointer;position:absolute;top:10px;right:15px;font-weight:bold;font-size:20px;">&times;</span>
+    <h2>AI SEO Score Explained</h2>
+    <ul style="text-align:left;">
+      <li><strong>0-20:</strong> Critical AI SEO issues.</li>
+      <li><strong>21-40:</strong> Severe AI SEO issues.</li>
+      <li><strong>41-60:</strong> Moderate AI SEO issues.</li>
+      <li><strong>61-80:</strong> Minor AI SEO issues.</li>
+      <li><strong>81-100:</strong> Excellent AI SEO health.</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  document.getElementById('analyzeButton').onclick = () => {
+    const url = document.getElementById('urlInput').value.trim();
+    if(url) window.location.href = `/index.html?url=${encodeURIComponent(url)}`;
+    else alert('Please enter a URL.');
+  };
+
+  const urlParam = new URLSearchParams(window.location.search).get("url");
+  if(urlParam){
+    document.getElementById('url-lightbox').style.display = 'none';
+    document.getElementById('inspected-url').textContent = urlParam;
+
+    fetch(`/friendly?url=${encodeURIComponent(urlParam)}&t=${new Date().getTime()}`, { cache: "no-store" })
+    .then(res => res.json())
+    .then(data => {
+      if(data.status==="processing"){
+        setTimeout(()=>window.location.reload(),3000); return;
+      }
+      document.getElementById("score-marker").style.left = data.score+'%';
+      document.getElementById("score-marker").style.animation='none';
+      document.getElementById("score-percentage").textContent = data.score+"%";
+      document.getElementById("waiting-message").style.display='none';
+
+      ["superpowers-list","opportunities-list","engine-insights-list"].forEach((id,i)=>{
+        document.getElementById(id).innerHTML = data[Object.keys(data)[i+1]].map(item=>`<li><strong>${item.title}</strong><p>${item.explanation}</p></li>`).join('');
+      });
+    });
+  }
+
+  document.getElementById('summaryForm').addEventListener('submit', e=>{
+    e.preventDefault();
+    window.location=`/full-report.html?url=${encodeURIComponent(urlParam)}`;
+  });
+
+  document.getElementById('scoreInfo').onclick=()=>document.getElementById('score-lightbox').style.display='flex';
+  document.getElementById('score-lightbox-close').onclick=()=>document.getElementById('score-lightbox').style.display='none';
+
+});
+</script>
+
+</body>
+</html>
