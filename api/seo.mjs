@@ -8,14 +8,6 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 8080;
 
-// In-memory storage for inquiries (For production, replace with a database)
-const inquiries = [];
-
-/**
- * Normalize URLs:
- * Accepts `example.com`, `www.example.com`, or full URLs.
- * Prepends `https://` if missing.
- */
 function normalizeUrl(url) {
   let trimmed = url.trim();
   if (!/^https?:\/\//i.test(trimmed)) {
@@ -24,76 +16,35 @@ function normalizeUrl(url) {
   return trimmed;
 }
 
-/**
- * Placeholder function for AI SEO Scoring.
- * Replace with real-world calculations.
- */
 function calculateSeoScore() {
-  return Math.floor(Math.random() * 10) + 1; // Generates a score between 1-10
+  return Math.floor(Math.random() * 10) + 1;
 }
 
-/**
- * Returns up to 10 "OK" points.
- */
 function getGoodPoints() {
-  const allGood = [
+  return [
     "Mobile-friendly design",
     "Fast page load speed",
     "Clear call-to-action buttons",
     "Secure HTTPS implementation",
     "Logical internal linking",
-    "Well-structured HTML headings",
-    "Readable font and layout",
-    "Up-to-date contact information",
-    "No broken links",
-    "Optimized image sizes",
-  ];
-  return allGood.slice(0, 10);
-}
-
-/**
- * Returns up to 25 "Needs to be Addressed" points.
- * The initial report shows 15; full report adds the remaining 10.
- */
-function getBadPoints() {
-  return [
-    "Missing or weak meta descriptions",
-    "Duplicate or missing title tags",
-    "No structured data markup",
-    "Unoptimized images without alt text",
-    "Broken external/internal links",
-    "Slow server response time",
-    "No XML sitemap submitted",
-    "Poor keyword targeting",
-    "Excessive pop-ups or interstitials",
-    "No robots.txt file",
-    "Low word count (thin content)",
-    "Lack of mobile optimization",
-    "High bounce rate",
-    "No Google Analytics installed",
-    "SSL certificate issues",
-    "Missing canonical tags",
-    "No backlinks from reputable sites",
-    "Orphan pages (not linked internally)",
-    "Inconsistent business name, address, or phone number",
-    "Poor accessibility (missing ARIA tags)",
-    "Content not updated frequently",
-    "No blog or fresh content strategy",
-    "Overly complex site navigation",
-    "Minimal social media integration",
-    "Spammy outbound links"
   ];
 }
 
-/**
- * Generates the HTML report.
- */
+const badPointsWithExplanations = [
+  { issue: "Missing canonical tags", explanation: "Helps prevent duplicate content issues and ensures search engines know the preferred URL." },
+  { issue: "No backlinks from reputable sites", explanation: "Backlinks improve domain authority and help with search engine rankings." },
+  { issue: "No structured data markup", explanation: "Structured data helps search engines understand content better for rich results." },
+  { issue: "Slow server response time", explanation: "Affects user experience and SEO rankings; optimize server and caching." },
+  { issue: "No robots.txt file", explanation: "Controls search engine crawling and prevents indexing of sensitive pages." }
+];
+
 function buildHtmlResponse(url, score, goodPoints, badPoints) {
-  const initialBad = badPoints.slice(0, 15);
-  const remainingBad = badPoints.slice(15);
+  const initialBad = badPoints.slice(0, 3);
+  const remainingBad = badPoints.slice(3);
 
   const goodHtml = goodPoints.map(pt => `<li>✅ ${pt}</li>`).join("");
-  const badHtml = initialBad.map(pt => `<li>🚨 ${pt}</li>`).join("");
+  const badHtml = initialBad.map(pt => `<li>🚨 ${pt.issue}</li>`).join("");
+  const detailedBadHtml = remainingBad.map(pt => `<li>🚨 <strong>${pt.issue}</strong><br/>${pt.explanation}</li>`).join("");
 
   return `
     <!DOCTYPE html>
@@ -107,8 +58,6 @@ function buildHtmlResponse(url, score, goodPoints, badPoints) {
           h1 { color: #333; }
           .score { font-weight: bold; color: #007BFF; font-size: 1.2em; }
           ul { padding-left: 20px; }
-          .form-section { margin-top: 30px; background: #f0f0f0; padding: 15px; border-radius: 6px; }
-          .form-section input { width: 100%; margin: 5px 0; padding: 5px; }
           .hidden { display: none; }
           .cta { text-align: center; padding: 10px; background: #fdecea; border-radius: 6px; margin-top: 20px; }
           .cta a { color: #d93025; font-weight: bold; text-decoration: none; }
@@ -117,7 +66,7 @@ function buildHtmlResponse(url, score, goodPoints, badPoints) {
       </head>
       <body>
         <div class="container">
-          <h1>AI SEO Analysis 🔎</h1>
+          <h1>AI SEO Analysis 🔎 <a href="#" id="info">(?)</a></h1>
           <p>URL inspected: <strong>${url}</strong></p>
           <p>Score: <span class="score">${score}/10</span></p>
 
@@ -133,14 +82,12 @@ function buildHtmlResponse(url, score, goodPoints, badPoints) {
             <input type="text" id="userName" /><br/>
             <label>Email*:</label>
             <input type="text" id="userEmail" /><br/>
-            <label>Company:</label>
-            <input type="text" id="userCompany" /><br/>
             <button id="getReportBtn">Get Full Report</button>
           </div>
 
           <div id="detailedReport" class="hidden">
             <h2>Detailed Report</h2>
-            <ul>${remainingBad.map(pt => `<li>🚨 ${pt}</li>`).join("")}</ul>
+            <ul>${detailedBadHtml}</ul>
             <div class="cta">
               <p>Need expert AI marketing help? <a href="https://calendly.com/theyoramezra" target="_blank">Schedule a call now!</a></p>
             </div>
@@ -158,6 +105,11 @@ function buildHtmlResponse(url, score, goodPoints, badPoints) {
             document.querySelector('.form-section').style.display = 'none';
             document.getElementById('detailedReport').classList.remove('hidden');
           });
+
+          document.getElementById('info').addEventListener('click', function(event) {
+            event.preventDefault();
+            alert("Scoring is based on AI analysis of SEO best practices, accessibility, and site structure.");
+          });
         </script>
       </body>
     </html>
@@ -170,7 +122,7 @@ app.get('/friendly', async (req, res) => {
 
   const url = normalizeUrl(targetUrl);
   const score = calculateSeoScore();
-  const html = buildHtmlResponse(url, score, getGoodPoints(), getBadPoints());
+  const html = buildHtmlResponse(url, score, getGoodPoints(), badPointsWithExplanations);
 
   res.status(200).send(html);
 });
