@@ -70,7 +70,7 @@ function normalizeUrl(url) {
 
 /**
  * Analyze HTML using Cheerio and return metrics.
- * (Defined only once, no duplicates.)
+ * (Declared only once.)
  */
 function analyzeHtml(html) {
   const $ = load(html);
@@ -273,21 +273,11 @@ Please provide a concise, detailed analysis and suggestions for improvement.
 }
 
 /**
- * Build the full HTML response.
- * The initial view includes:
- * - A summary report with SEO score (0-10), lists, and a contact form.
- * The detailed report view includes:
- * - A header with the URL, overall score, and a (?) button,
- * - An "Enter another URL" link that goes back to the landing page,
- * - The detailed explanation for each issue with red emoji bullets,
- * - An "Advanced SEO Analysis" section powered by ChatGPT,
- * - And a call-to-action for contacting you.
+ * Build the full HTML response (summary and detailed report views).
  */
 function buildHtmlResponse(url, score, goodPoints, badPointsPool, metrics, chatGPTAnalysis) {
   const goodHtml = goodPoints.map(pt => `<li>✅ ${pt}</li>`).join("");
   const badHtml = badPointsPool.slice(0, 15).map(pt => `<li>🚨 ${pt}</li>`).join("");
-
-  // Explanation text with line breaks for the scoring system.
   const explanationText = `
 This SEO score of ${score}/10 is calculated based on the following factors:<br><br>
 <strong>1. Title Tag:</strong><br>
@@ -308,8 +298,7 @@ This SEO score of ${score}/10 is calculated based on the following factors:<br><
 &nbsp;&nbsp;&bull; Alt text is needed for accessibility and SEO.<br>
 &nbsp;&nbsp;&bull; Each missing alt attribute deducts a small amount (up to 3 points total).<br><br>
 The score starts at 10, with points deducted for each issue found.
-`;
-
+  `;
   return `
     <!DOCTYPE html>
     <html>
