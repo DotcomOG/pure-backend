@@ -5,7 +5,6 @@ import { load } from 'cheerio';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// Derive __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -156,13 +155,11 @@ function generateBadPoints(metrics) {
 
 /**
  * Build the full HTML response.
- * This page displays:
- * - A summary report with SEO score (0-10)
- * - 10 "What's OK" points
- * - 15 "Needs to be Addressed" points
- * - A contact form (Name*, Email*, Company)
- * - A lightbox explaining the scoring system (triggered by a ? button)
- * Upon form submission, the detailed report is revealed.
+ * Display:
+ * - SEO score (0-10)
+ * - "What's OK" points
+ * - "Needs to be Addressed" points
+ * - ChatGPT mention
  */
 function buildHtmlResponse(url, score, goodPoints, badPointsPool, metrics) {
   const goodHtml = goodPoints.map(pt => `<li>✅ ${pt}</li>`).join("");
@@ -175,102 +172,35 @@ function buildHtmlResponse(url, score, goodPoints, badPointsPool, metrics) {
     - Proper alt text for images
     Points are deducted for any issues found.
   `;
-  
-  function buildDetailedReportHtml() {
-    const detailedHtml = badPointsPool.map(issue => `<li>🚨 ${issue}</li>`).join("<br>");
-    return `<h2>Detailed Report</h2><ul>${detailedHtml}</ul>`;
-  }
-  
+
   return `
     <!DOCTYPE html>
     <html>
       <head>
         <meta charset="UTF-8" />
-        <title>AI SEO Analysis</title>
+        <title>AI SEO Analysis (Powered by ChatGPT)</title>
         <style>
           body { font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px; }
           .container { max-width: 700px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
           h1, h2 { color: #333; }
           .score { font-weight: bold; color: #007BFF; }
           ul { padding-left: 20px; }
-          .form-section { margin-top: 20px; padding: 15px; background: #e9e9e9; border-radius: 6px; }
-          .form-section input { padding: 8px; margin-bottom: 10px; width: calc(100% - 16px); }
-          .hidden { display: none; }
-          .detailed-report { margin-top: 20px; background: #fff7e6; padding: 15px; border-radius: 6px; }
-          .cta { text-align: center; padding: 10px; background: #fdecea; border-radius: 6px; margin-top: 20px; }
-          .cta a { color: #d93025; font-weight: bold; text-decoration: none; }
-          .cta a:hover { text-decoration: underline; }
-          .lightboxOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; }
-          .lightboxContent { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; padding: 20px; border-radius: 8px; max-width: 500px; width: 90%; }
-          .closeLightbox { cursor: pointer; float: right; color: #007BFF; }
-          .score-container { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
-          .question-mark { background: #007BFF; color: #fff; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-weight: bold; text-align: center; }
+          .footer { margin-top: 20px; text-align: center; font-size: 0.9em; color: #555; }
         </style>
       </head>
       <body>
-        <div class="container" id="initialContainer">
-          <h1>AI SEO Analysis Report</h1>
+        <div class="container">
+          <h1>AI SEO Analysis (Powered by ChatGPT)</h1>
           <p>URL inspected: <strong>${url}</strong></p>
-          <div class="score-container">
-            <p>SEO Score: <span class="score">${score}/10</span></p>
-            <button class="question-mark" id="openLightbox">?</button>
-          </div>
+          <p>SEO Score: <span class="score">${score}/10</span></p>
           <h2>What's OK</h2>
           <ul>${goodHtml}</ul>
           <h2>Needs to be Addressed</h2>
           <ul>${badHtml}</ul>
-          <div class="form-section">
-            <p><strong>Get your full detailed report</strong> (Fill out the form below):</p>
-            <label>Name*:</label><br>
-            <input type="text" id="userName" placeholder="Your Name" /><br>
-            <label>Email*:</label><br>
-            <input type="email" id="userEmail" placeholder="Your Email" /><br>
-            <label>Company (Optional):</label><br>
-            <input type="text" id="userCompany" placeholder="Your Company" /><br>
-            <button id="submitForm">Submit</button>
+          <div class="footer">
+            <p>This advanced SEO analysis is powered by ChatGPT</p>
           </div>
         </div>
-
-        <div class="container hidden" id="detailedReportContainer">
-          ${buildDetailedReportHtml()}
-          <div class="cta">
-            <p>Contact us for a free consultation!</p>
-            <a href="mailto:youremail@example.com">Set up a call</a>
-          </div>
-        </div>
-
-        <div class="lightboxOverlay" id="lightboxOverlay">
-          <div class="lightboxContent">
-            <span class="closeLightbox" id="closeLightbox">Close ✖</span>
-            <h2>Scoring Explanation</h2>
-            <p>${explanationText}</p>
-          </div>
-        </div>
-
-        <script>
-          document.getElementById('openLightbox').addEventListener('click', () => {
-            document.getElementById('lightboxOverlay').style.display = 'block';
-          });
-          document.getElementById('closeLightbox').addEventListener('click', () => {
-            document.getElementById('lightboxOverlay').style.display = 'none';
-          });
-
-          document.getElementById('submitForm').addEventListener('click', () => {
-            const name = document.getElementById('userName').value.trim();
-            const email = document.getElementById('userEmail').value.trim();
-            if (!name || !email) {
-              alert("Name and Email are required.");
-              return;
-            }
-            console.log("Inquiry received:", {
-              name: name,
-              email: email,
-              company: document.getElementById('userCompany').value.trim()
-            });
-            document.getElementById('initialContainer').classList.add('hidden');
-            document.getElementById('detailedReportContainer').classList.remove('hidden');
-          });
-        </script>
       </body>
     </html>
   `;
@@ -278,20 +208,19 @@ function buildHtmlResponse(url, score, goodPoints, badPointsPool, metrics) {
 
 /**
  * GET /friendly?url=example.com
- * Performs real-time SEO analysis and returns an HTML page with a summary report.
+ * Real-time SEO analysis
  */
 app.get('/friendly', async (req, res) => {
   const targetUrl = req.query.url;
   if (!targetUrl) return res.status(400).send('Please provide a ?url= parameter');
-  
+
   const url = normalizeUrl(targetUrl);
   try {
     const response = await fetch(url, {
       headers: {
-        // Custom user-agent to reduce blocks
         'User-Agent': 'AI-SEO-Crawler/1.0 (https://yourwebsite.com)'
       },
-      redirect: 'follow' // follow HTTP redirects
+      redirect: 'follow'
     });
 
     if (!response.ok) {
@@ -299,12 +228,11 @@ app.get('/friendly', async (req, res) => {
     }
 
     const html = await response.text();
-    
     const metrics = analyzeHtml(html);
     const score = calculateSeoScore(metrics);
     const goodPoints = generateGoodPoints(metrics);
     const badPointsPool = generateBadPoints(metrics);
-    
+
     const htmlContent = buildHtmlResponse(url, score, goodPoints, badPointsPool, metrics);
     res.status(200).send(htmlContent);
   } catch (error) {
@@ -313,10 +241,7 @@ app.get('/friendly', async (req, res) => {
   }
 });
 
-/**
- * POST /report
- * Accepts inquiry details and stores them in memory (for demonstration).
- */
+// Simple POST route for demonstration
 app.post('/report', (req, res) => {
   const { url, name, email, company } = req.body;
   if (!url || !name || !email) {
