@@ -4,6 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "start": "node server.js",
     "server": "node server.js"
   },
   "dependencies": {
