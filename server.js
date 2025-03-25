@@ -5,23 +5,20 @@ import { load } from 'cheerio';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// Derive __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-// Changed port to 3001 instead of 8080
 const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json());
 
-// In-memory storage for inquiries (for production, use a persistent database)
+// Simple in-memory storage (for demonstration)
 const inquiries = [];
 
 /**
- * Normalize a URL.
- * Accepts "xxx.com" or "www.xxx.com" and prepends "https://".
+ * Normalize a URL (adds https:// if missing).
  */
 function normalizeUrl(url) {
   let trimmed = url.trim();
@@ -33,7 +30,7 @@ function normalizeUrl(url) {
 }
 
 /**
- * Analyze HTML using Cheerio and return metrics.
+ * Analyze HTML using Cheerio to gather SEO metrics.
  */
 function analyzeHtml(html) {
   const $ = load(html);
@@ -61,8 +58,7 @@ function analyzeHtml(html) {
 }
 
 /**
- * Calculate a real SEO score based on HTML analysis.
- * Starting with 10 points, subtract for each issue.
+ * Calculate a simple SEO score (0-10).
  */
 function calculateSeoScore(metrics) {
   let score = 10;
@@ -157,24 +153,10 @@ function generateBadPoints(metrics) {
 
 /**
  * Build the full HTML response.
- * Display:
- * - SEO score (0-10)
- * - "What's OK" points
- * - "Needs to be Addressed" points
- * - ChatGPT mention
  */
 function buildHtmlResponse(url, score, goodPoints, badPointsPool, metrics) {
   const goodHtml = goodPoints.map(pt => `<li>✅ ${pt}</li>`).join("");
   const badHtml = badPointsPool.slice(0, 15).map(pt => `<li>🚨 ${pt}</li>`).join("");
-  const explanationText = `
-    This SEO score of ${score}/10 is calculated based on:
-    - Title tag presence and optimal length (30-60 characters)
-    - Meta description presence and optimal length (50-160 characters)
-    - Presence of canonical and H1 tags
-    - Proper alt text for images
-    Points are deducted for any issues found.
-  `;
-
   return `
     <!DOCTYPE html>
     <html>
@@ -209,15 +191,13 @@ function buildHtmlResponse(url, score, goodPoints, badPointsPool, metrics) {
 }
 
 /**
- * GET /friendly?url=example.com
- * Real-time SEO analysis endpoint.
+ * GET /friendly?url=<site>
  */
 app.get('/friendly', async (req, res) => {
   const targetUrl = req.query.url;
   if (!targetUrl) {
     return res.status(400).send('Please provide a ?url= parameter');
   }
-
   const url = normalizeUrl(targetUrl);
   try {
     const response = await fetch(url, {
@@ -226,17 +206,14 @@ app.get('/friendly', async (req, res) => {
       },
       redirect: 'follow'
     });
-
     if (!response.ok) {
       throw new Error(`Failed to fetch. HTTP status: ${response.status}`);
     }
-
     const html = await response.text();
     const metrics = analyzeHtml(html);
     const score = calculateSeoScore(metrics);
     const goodPoints = generateGoodPoints(metrics);
     const badPointsPool = generateBadPoints(metrics);
-
     const htmlContent = buildHtmlResponse(url, score, goodPoints, badPointsPool, metrics);
     res.status(200).send(htmlContent);
   } catch (error) {
@@ -245,7 +222,7 @@ app.get('/friendly', async (req, res) => {
   }
 });
 
-// Start the server on PORT 3001
+// Start the server
 app.listen(PORT, () => {
   console.log(`Express server is running on port ${PORT}`);
 });
