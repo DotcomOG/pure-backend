@@ -284,6 +284,31 @@ function buildDetailedReport(url, score, goodPoints, badPoints) {
 }
 
 /**
+ * Default route (Homepage) at "/"
+ * Displays a simple welcome message for users visiting the root path.
+ */
+app.get('/', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="UTF-8" />
+        <title>AI SEO Tool</title>
+        <style>
+          body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+          a { color: #007BFF; text-decoration: none; font-weight: bold; }
+        </style>
+      </head>
+      <body>
+        <h1>Welcome to the AI SEO Tool</h1>
+        <p>Use our <a href="/friendly?url=https://example.com">/friendly</a> endpoint to analyze a site.</p>
+        <p>For a detailed report, submit your information after the summary.</p>
+      </body>
+    </html>
+  `);
+});
+
+/**
  * GET /friendly?url=<site>
  * Returns the high-level summary report.
  */
@@ -344,9 +369,13 @@ app.post('/detailed', async (req, res) => {
     const score = calculateSeoScore(metrics);
     const goodPoints = generateGoodPoints(metrics);
     const badPoints = generateBadPoints(metrics);
+
+    // Build the detailed report HTML
     const detailedHtml = buildDetailedReport(url, score, goodPoints, badPoints);
-    // Store the inquiry (for demonstration purposes)
+
+    // Store the inquiry (for demonstration)
     inquiries.push({ url, name, email, company, timestamp: new Date() });
+
     res.status(200).send(detailedHtml);
   } catch (error) {
     console.error("Error fetching URL:", error);
