@@ -10,21 +10,21 @@ const PORT = process.env.PORT || 8080;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Log the __dirname so we can verify the folder structure on Railway
+// Log the __dirname for debugging
 console.log("Server __dirname:", __dirname);
 
-// Construct the path to main.html
-const mainFile = path.join(__dirname, 'Public', 'main.html');
+// Construct the path to main.html using lowercase "public"
+const mainFile = path.join(__dirname, 'public', 'main.html');
 
-// Check if main.html exists
+// Check if main.html exists in the lowercase "public" folder
 if (fs.existsSync(mainFile)) {
   console.log("Found main.html at:", mainFile);
 } else {
   console.log("main.html NOT found at:", mainFile);
 }
 
-// Serve static files from the Public folder
-app.use(express.static(path.join(__dirname, 'Public')));
+// Serve static files from the lowercase "public" folder
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Define the root route to serve main.html explicitly
 app.get('/', (req, res) => {
