@@ -2,8 +2,6 @@ import express from 'express';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import dotenv from 'dotenv';
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -11,18 +9,19 @@ const PORT = process.env.PORT || 8080;
 // Set __dirname for ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Log the __dirname for debugging
 console.log("Server __dirname:", __dirname);
 
-// Define the public folder path
-const publicPath = path.join(__dirname, 'public');
-console.log("Serving static files from:", publicPath);
+// Serve static files from the 'public' folder
+const publicDir = path.join(__dirname, 'public');
+console.log("Serving static files from:", publicDir);
+app.use(express.static(publicDir));
 
-// Serve static files from the public folder
-app.use(express.static(publicPath));
-
-// Route for the main page (if needed)
+// Root route: serve main.html from the public folder
 app.get('/', (req, res) => {
-  res.sendFile(path.join(publicPath, 'main.html'), (err) => {
+  const mainFile = path.join(publicDir, 'main.html');
+  res.sendFile(mainFile, (err) => {
     if (err) {
       console.error("Error sending main.html:", err);
       res.status(500).send("Error loading page.");
@@ -30,14 +29,10 @@ app.get('/', (req, res) => {
   });
 });
 
-// Explicit route for input.html (if needed)
-app.get('/input.html', (req, res) => {
-  res.sendFile(path.join(publicPath, 'input.html'), (err) => {
-    if (err) {
-      console.error("Error sending input.html:", err);
-      res.status(500).send("Error loading input page.");
-    }
-  });
+// Dynamic /friendly endpoint: placeholder for dynamic analysis
+app.get('/friendly', (req, res) => {
+  // This is where you would integrate dynamic analysis logic (e.g., with ChatGPT)
+  res.send("Placeholder for dynamic analysis");
 });
 
 // Start the server
