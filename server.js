@@ -17,9 +17,11 @@ const __dirname = path.dirname(__filename);
 // Log the __dirname for debugging
 console.log("Server __dirname:", __dirname);
 
-// Serve static files from the 'public' folder
+// Define the public directory and log it
 const publicDir = path.join(__dirname, 'public');
 console.log("Serving static files from:", publicDir);
+
+// Serve static files from the 'public' folder
 app.use(express.static(publicDir));
 
 // Parse incoming JSON and URL-encoded payloads
@@ -42,14 +44,15 @@ app.get('/input.html', (req, res) => {
 });
 
 // Example route: /friendly?url=<site>
-// This route returns a simple placeholder report and uses the OpenAI chat completions API
+// This route returns a dynamic analysis generated using OpenAI's chat completions API
 app.get('/friendly', async (req, res) => {
   const targetUrl = req.query.url;
   if (!targetUrl) {
     return res.status(400).send('Please provide a ?url= parameter');
   }
-  // For demonstration, we create a prompt that asks ChatGPT to analyze the URL
+  
   const prompt = `Analyze the following website URL for AI SEO opportunities and provide a detailed analysis: ${targetUrl}`;
+  
   try {
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
@@ -83,8 +86,9 @@ app.get('/friendly', async (req, res) => {
       </html>
     `);
   } catch (error) {
-    console.error("Error generating AI SEO analysis:", error);
-    res.status(500).send("Error generating detailed AI SEO analysis.");
+    console.error("Error generating detailed AI SEO analysis:", error);
+    // Return error details in JSON for debugging (remove in production)
+    res.status(500).json({ error: error.message });
   }
 });
 
