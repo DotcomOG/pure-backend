@@ -22,7 +22,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Initialize OpenAI using default import (v4+)
+// Initialize OpenAI (v4+)
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -50,17 +50,17 @@ app.get('/friendly', async (req, res) => {
     const html = await response.text();
     const $ = load(html);
     
-    // Extract basic info from the page
+    // Extract basic information from the page
     const title = $('title').text().trim();
     const metaDesc = $('meta[name="description"]').attr('content') || "No meta description found";
 
-    // Build a prompt for dynamic analysis
+    // Build a prompt for the dynamic analysis
     const prompt = `You are an AI SEO expert. Provide a detailed AI SEO analysis summary for the website: ${url}.
 The site's title is "${title}" and its meta description is "${metaDesc}". 
 Give actionable recommendations specific to AI SEO for engines such as ChatGPT, Claude, Google Gemini, Microsoft Copilot, and Jasper AI.
 Use a professional tone with creative insights and a wow factor.`;
 
-    // Request completion from OpenAI using completions.create()
+    // Request completion from OpenAI
     const aiResponse = await openai.completions.create({
       model: "text-davinci-003",
       prompt: prompt,
@@ -71,8 +71,9 @@ Use a professional tone with creative insights and a wow factor.`;
 
     res.send(analysis);
   } catch (error) {
-    console.error("Error generating analysis:", error);
-    res.status(500).send("Error generating dynamic AI SEO analysis.");
+    console.error("Error generating dynamic AI SEO analysis:", error);
+    // Send the error message in the response for debugging (remove in production)
+    res.status(500).send("Error generating dynamic AI SEO analysis: " + error.message);
   }
 });
 
