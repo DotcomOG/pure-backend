@@ -2,6 +2,7 @@ import express from 'express';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import fetch from 'node-fetch';
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -9,38 +10,68 @@ const PORT = process.env.PORT || 8080;
 // Set __dirname for ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Log __dirname for debugging
 console.log("Server __dirname:", __dirname);
 
-// Serve static files from the public folder (if any)
-const publicFolder = path.join(__dirname, 'public');
-app.use(express.static(publicFolder));
+// Define the path to main.html inside your public folder
+const mainFile = path.join(__dirname, 'public', 'main.html');
 
-// Also serve static files from the project root
-app.use(express.static(__dirname));
+// Check if main.html exists
+if (fs.existsSync(mainFile)) {
+  console.log("Found main.html at:", mainFile);
+} else {
+  console.log("main.html NOT found at:", mainFile);
+}
 
-// Define root route: serve main.html from the public folder
-const mainFile = path.join(publicFolder, 'main.html');
+// Serve static files from the 'public' folder
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Root route: serve main.html
 app.get('/', (req, res) => {
-  if (fs.existsSync(mainFile)) {
-    res.sendFile(mainFile, (err) => {
-      if (err) {
-        console.error("Error sending main.html:", err);
-        res.status(500).send("Error loading page.");
-      }
-    });
-  } else {
-    res.status(404).send("main.html not found");
-  }
+  res.sendFile(mainFile, (err) => {
+    if (err) {
+      console.error("Error sending main.html:", err);
+      res.status(500).send("Error loading page.");
+    }
+  });
 });
 
-// Explicit route for input.html in the project root
-app.get('/input.html', (req, res) => {
-  const inputFile = path.join(__dirname, 'input.html');
-  console.log("Looking for input.html at:", inputFile);
-  if (fs.existsSync(inputFile)) {
-    res.sendFile(inputFile);
-  } else {
-    res.status(404).send("input.html not found");
+// /friendly route: receives a URL query parameter and fetches that page.
+// (This is a placeholder for your dynamic analysis logic.)
+app.get('/friendly', async (req, res) => {
+  const targetUrl = req.query.url;
+  if (!targetUrl) {
+    return res.status(400).send('Please provide a ?url= parameter');
+  }
+  
+  // Normalize URL: add "https://" if missing
+  let normalizedUrl = targetUrl;
+  if (!/^https?:\/\//i.test(targetUrl)) {
+    normalizedUrl = "https://" + targetUrl;
+  }
+  
+  try {
+    const response = await fetch(normalizedUrl, {
+      headers: { 'User-Agent': 'AI-SEO-Tool/1.0' }
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    const html = await response.text();
+    
+    // For now, just send a simple placeholder response.
+    res.send(`
+      <h1>AI SEO Analysis for ${normalizedUrl}</h1>
+      <p>This is a placeholder for the dynamic analysis.</p>
+      <div style="border: 1px solid #ccc; padding: 10px; margin-top: 20px;">
+        Fetched HTML content (truncated):<br>
+        ${html.substring(0, 500)}...
+      </div>
+    `);
+  } catch (error) {
+    console.error("Error fetching URL:", error);
+    res.status(500).send("Error retrieving content from the provided URL.");
   }
 });
 
