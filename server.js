@@ -1,102 +1,83 @@
 import express from 'express';
-import fetch from 'node-fetch';
 import cors from 'cors';
 import { load } from 'cheerio';
 import path from 'path';
-import fs from 'fs';
 import { fileURLToPath } from 'url';
 import OpenAI from 'openai';
 import dotenv from 'dotenv';
-
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Set __dirname for ES Modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Log the __dirname for debugging
-console.log("Server __dirname:", __dirname);
-
-// Serve static files from the 'public' folder
-app.use(express.static(path.join(__dirname, 'public')));
-
-// For parsing JSON bodies
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Configure OpenAI client (for v4, the default import gives you a client instance)
+// Log the last 4 characters of the API key for debugging (do not log the full key)
+const key = process.env.OPENAI_API_KEY;
+if (key) {
+  console.log("Using OpenAI API key ending in:", key.slice(-4));
+} else {
+  console.error("No OpenAI API key found in environment variables.");
+}
+
+// Initialize OpenAI client (ensure you have openai v4+ installed)
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Route for summary analysis (example endpoint)
+// Detailed report endpoint using the ChatGPT API
+app.post('/detailed', async (req, res) => {
+  const { url, name, email, company } = req.body;
+  if (!url || !name || !email) {
+    return res.status(400).json({ error: "URL, Name, and Email are required." });
+  }
+  try {
+    // Call the OpenAI chat completions API for a detailed analysis
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          role: "system",
+          content: "You are an AI SEO expert. Provide a detailed analysis of the website with 20 to 50 opportunities for improvement. Your analysis must be AI SEO specific and mention insights for ChatGPT, Claude, Google Gemini, Microsoft Copilot, and Jasper AI. Each issue must have between 2 to 5 lines of detailed explanation."
+        },
+        {
+          role: "user",
+          content: `Analyze the website ${url} and generate a detailed AI SEO analysis report.`
+        }
+      ],
+      temperature: 0.7,
+    });
+    const report = completion.choices[0].message.content;
+    res.status(200).json({ report });
+  } catch (error) {
+    console.error("Error generating AI SEO analysis:", error);
+    res.status(500).json({ error: "Error generating detailed AI SEO analysis." });
+  }
+});
+
+// Summary report endpoint (for demonstration, returns a placeholder)
 app.get('/friendly', async (req, res) => {
   const targetUrl = req.query.url;
   if (!targetUrl) {
-    return res.status(400).send('Please provide a ?url= parameter');
+    return res.status(400).send("Please provide a url parameter.");
   }
-  const url = targetUrl.trim().startsWith('http') ? targetUrl.trim() : 'https://' + targetUrl.trim();
-  
-  try {
-    // Fetch the target page content
-    const response = await fetch(url, {
-      headers: { 'User-Agent': 'AI-SEO-Crawler/1.0 (https://yourwebsite.com)' },
-      redirect: 'follow'
-    });
-    if (!response.ok) {
-      throw new Error(`Failed to fetch. HTTP status: ${response.status}`);
-    }
-    const html = await response.text();
-    const $ = load(html);
-    const title = $('title').text().trim();
-    
-    // (Insert your analysis logic here, e.g., using cheerio to extract SEO metrics)
-    const analysis = `Analyzed content from ${url}. Title found: "${title}"`;
-    
-    // Generate a dynamic summary using OpenAI's chat completions
-    const chatResponse = await openai.chat.completions.create({
-      model: "gpt-4",
-      messages: [
-        { role: "system", content: "You are a helpful AI SEO analysis assistant." },
-        { role: "user", content: `Please generate a short SEO analysis summary for the following content: ${analysis}` }
-      ],
-      max_tokens: 100
-    });
-    
-    const summary = chatResponse.choices[0].message.content;
-    res.send(`<html><body><h1>SEO Summary for ${url}</h1><p>${summary}</p></body></html>`);
-  } catch (error) {
-    console.error("Error generating AI SEO analysis:", error);
-    res.status(500).send("Error generating detailed AI SEO analysis.");
-  }
+  // You would normally perform analysis here using Cheerio etc.
+  res.send("Placeholder for dynamic AI SEO analysis summary.");
 });
 
-// Route for serving the input page
-app.get('/input.html', (req, res) => {
-  const inputFile = path.join(__dirname, 'public', 'input.html');
-  res.sendFile(inputFile, (err) => {
-    if (err) {
-      console.error("Error sending input.html:", err);
-      res.status(500).send("Error loading input page.");
-    }
-  });
-});
+// Serve static files from the "public" directory
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Default route (serves main.html)
+// Root route to serve the input page (input.html should be in the public folder)
 app.get('/', (req, res) => {
-  const mainFile = path.join(__dirname, 'public', 'main.html');
-  res.sendFile(mainFile, (err) => {
-    if (err) {
-      console.error("Error sending main.html:", err);
-      res.status(500).send("Error loading main page.");
-    }
-  });
+  res.sendFile(path.join(__dirname, 'public', 'input.html'));
 });
 
-// Start the server
 app.listen(PORT, () => {
   console.log(`Express server is running on port ${PORT}`);
 });
