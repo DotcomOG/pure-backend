@@ -85,7 +85,7 @@ Based on these metrics, provide a comprehensive AI SEO report with deep insights
 `;
   
   const openai = new OpenAI({
-    apiKey: process.env.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,
+    apiKey: process.env.OPENAI_API_KEY,
   });
   
   try {
