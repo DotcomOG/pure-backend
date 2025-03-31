@@ -1,81 +1,166 @@
 import express from 'express';
-import path from 'path';
-import fs from 'fs';
-import { fileURLToPath } from 'url';
 import fetch from 'node-fetch';
+import cors from 'cors';
+import { load } from 'cheerio';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import OpenAI from 'openai'; // Ensure openai v4+ is installed
+import dotenv from 'dotenv';
+dotenv.config();
 
-const app = express();
-const PORT = process.env.PORT || 8080;
-
-// Set __dirname for ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Log __dirname for debugging
-console.log("Server __dirname:", __dirname);
+const app = express();
+const PORT = process.env.PORT || 3001;
 
-// Define the path to main.html inside your public folder
-const mainFile = path.join(__dirname, 'public', 'main.html');
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Check if main.html exists
-if (fs.existsSync(mainFile)) {
-  console.log("Found main.html at:", mainFile);
-} else {
-  console.log("main.html NOT found at:", mainFile);
+// In-memory storage for inquiries (for demonstration)
+const inquiries = [];
+
+/**
+ * Normalize the URL. If the URL does not start with "http://" or "https://",
+ * prepend "https://".
+ */
+function normalizeUrl(url) {
+  let trimmed = url.trim();
+  if (!/^https?:\/\//i.test(trimmed)) {
+    trimmed = trimmed.replace(/^www\./i, '');
+    return "https://" + trimmed;
+  }
+  return trimmed;
 }
 
-// Serve static files from the 'public' folder
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Root route: serve main.html
-app.get('/', (req, res) => {
-  res.sendFile(mainFile, (err) => {
-    if (err) {
-      console.error("Error sending main.html:", err);
-      res.status(500).send("Error loading page.");
+/**
+ * Analyze HTML using Cheerio to extract some basic SEO metrics.
+ */
+function analyzeHtml(html) {
+  const $ = load(html);
+  const title = $('title').text().trim();
+  const metaDesc = $('meta[name="description"]').attr('content') || "";
+  const canonical = $('link[rel="canonical"]').attr('href') || "";
+  const h1 = $('h1').first().text().trim();
+  const images = $('img');
+  let imagesWithoutAlt = 0;
+  images.each((i, el) => {
+    if (!$(el).attr('alt')) {
+      imagesWithoutAlt++;
     }
   });
-});
+  return {
+    title,
+    titleLength: title.length,
+    metaDesc: metaDesc.trim(),
+    metaDescLength: metaDesc.trim().length,
+    canonical: canonical.trim(),
+    hasH1: h1.length > 0,
+    totalImages: images.length,
+    imagesWithoutAlt
+  };
+}
 
-// /friendly route: receives a URL query parameter and fetches that page.
-// (This is a placeholder for your dynamic analysis logic.)
-app.get('/friendly', async (req, res) => {
-  const targetUrl = req.query.url;
-  if (!targetUrl) {
-    return res.status(400).send('Please provide a ?url= parameter');
-  }
+/**
+ * Generate a dynamic AI SEO analysis report by calling the OpenAI API.
+ * The prompt includes the URL and extracted metrics.
+ */
+async function generateDynamicAnalysis(url, html) {
+  const metrics = analyzeHtml(html);
+  const prompt = `
+You are an expert in AI SEO. Analyze the following website information and provide an impressive, detailed report that highlights at least 20 improvement opportunities tailored for advanced AI SEO. Your analysis must include actionable feedback for AI engines such as ChatGPT, Claude (Anthropic), Google Gemini, Microsoft Copilot, and Jasper AI. Use whimsical, engaging language and ensure each opportunity is explained in 2 to 5 lines.
   
-  // Normalize URL: add "https://" if missing
-  let normalizedUrl = targetUrl;
-  if (!/^https?:\/\//i.test(targetUrl)) {
-    normalizedUrl = "https://" + targetUrl;
-  }
+Website URL: ${url}
+
+Extracted Metrics:
+- Title: "${metrics.title}" (length: ${metrics.titleLength})
+- Meta Description: "${metrics.metaDesc}" (length: ${metrics.metaDescLength})
+- Canonical URL: "${metrics.canonical}"
+- H1 present: ${metrics.hasH1 ? "Yes" : "No"}
+- Total Images: ${metrics.totalImages}
+- Images missing alt text: ${metrics.imagesWithoutAlt}
+
+Based on these metrics, provide a comprehensive AI SEO report with deep insights and creative recommendations.
+`;
+  
+  const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
   
   try {
-    const response = await fetch(normalizedUrl, {
-      headers: { 'User-Agent': 'AI-SEO-Tool/1.0' }
+    const response = await openai.chat.completions.create({
+      model: "gpt-4",
+      messages: [
+        { role: "system", content: "You are a helpful AI SEO analysis assistant." },
+        { role: "user", content: prompt }
+      ],
+      temperature: 0.7,
+      max_tokens: 1500,
     });
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    const html = await response.text();
-    
-    // For now, just send a simple placeholder response.
-    res.send(`
-      <h1>AI SEO Analysis for ${normalizedUrl}</h1>
-      <p>This is a placeholder for the dynamic analysis.</p>
-      <div style="border: 1px solid #ccc; padding: 10px; margin-top: 20px;">
-        Fetched HTML content (truncated):<br>
-        ${html.substring(0, 500)}...
-      </div>
-    `);
+    return response.choices[0].message.content;
   } catch (error) {
-    console.error("Error fetching URL:", error);
-    res.status(500).send("Error retrieving content from the provided URL.");
+    console.error("Error generating GPT analysis:", error);
+    return "Error generating detailed AI SEO analysis.";
+  }
+}
+
+/**
+ * GET /friendly?url=<site>
+ * Fetches the target URL, extracts HTML metrics, generates a dynamic AI SEO report via ChatGPT,
+ * and returns an HTML page displaying the report.
+ */
+app.get('/friendly', async (req, res) => {
+  const targetUrl = req.query.url;
+  if (!targetUrl) return res.status(400).send("Please provide a ?url= parameter");
+  
+  const url = normalizeUrl(targetUrl);
+  
+  try {
+    const response = await fetch(url, {
+      headers: { 'User-Agent': 'AI-SEO-Crawler/1.0 (https://yourwebsite.com)' },
+      redirect: 'follow'
+    });
+    if (!response.ok) throw new Error(`Failed to fetch URL. Status: ${response.status}`);
+    
+    const html = await response.text();
+    const dynamicAnalysis = await generateDynamicAnalysis(url, html);
+    
+    const resultHtml = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="UTF-8" />
+          <title>Dynamic AI SEO Analysis for ${url}</title>
+          <style>
+            body { font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px; }
+            .container { max-width: 800px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+            h1 { font-family: 'Forum', sans-serif; font-size: 1.8em; color: #333; }
+            pre { white-space: pre-wrap; font-size: 0.95em; color: #333; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h1>Dynamic AI SEO Analysis for ${url}</h1>
+            <pre>${dynamicAnalysis}</pre>
+          </div>
+        </body>
+      </html>
+    `;
+    
+    res.send(resultHtml);
+  } catch (error) {
+    console.error("Error in /friendly route:", error);
+    res.status(500).send("Error generating AI SEO analysis.");
   }
 });
 
-// Start the server
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.send("OK");
+});
+
+// Start the Express server
 app.listen(PORT, () => {
   console.log(`Express server is running on port ${PORT}`);
 });
