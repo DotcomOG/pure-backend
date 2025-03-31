@@ -2,6 +2,8 @@ import express from 'express';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -9,17 +11,18 @@ const PORT = process.env.PORT || 8080;
 // Set __dirname for ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-// Log __dirname for debugging
 console.log("Server __dirname:", __dirname);
 
-// Serve static files from the public folder
-app.use(express.static(path.join(__dirname, 'public')));
+// Define the public folder path
+const publicPath = path.join(__dirname, 'public');
+console.log("Serving static files from:", publicPath);
 
-// Define route for the root - serves main.html
+// Serve static files from the public folder
+app.use(express.static(publicPath));
+
+// Route for the main page (if needed)
 app.get('/', (req, res) => {
-  const mainFile = path.join(__dirname, 'public', 'main.html');
-  res.sendFile(mainFile, (err) => {
+  res.sendFile(path.join(publicPath, 'main.html'), (err) => {
     if (err) {
       console.error("Error sending main.html:", err);
       res.status(500).send("Error loading page.");
@@ -27,21 +30,17 @@ app.get('/', (req, res) => {
   });
 });
 
-// Define route for input.html explicitly (if needed)
+// Explicit route for input.html (if needed)
 app.get('/input.html', (req, res) => {
-  const inputFile = path.join(__dirname, 'public', 'input.html');
-  if (fs.existsSync(inputFile)) {
-    res.sendFile(inputFile, (err) => {
-      if (err) {
-        console.error("Error sending input.html:", err);
-        res.status(500).send("Error loading page.");
-      }
-    });
-  } else {
-    res.status(404).send("input.html not found.");
-  }
+  res.sendFile(path.join(publicPath, 'input.html'), (err) => {
+    if (err) {
+      console.error("Error sending input.html:", err);
+      res.status(500).send("Error loading input page.");
+    }
+  });
 });
 
+// Start the server
 app.listen(PORT, () => {
   console.log(`Express server is running on port ${PORT}`);
 });
