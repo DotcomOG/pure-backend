@@ -9,31 +9,39 @@ const PORT = process.env.PORT || 8080;
 // Set __dirname for ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-// Log the __dirname for debugging
 console.log("Server __dirname:", __dirname);
 
-// Construct the path to main.html using lowercase "public"
-const mainFile = path.join(__dirname, 'public', 'main.html');
+// Serve static files from the public folder (if any)
+const publicFolder = path.join(__dirname, 'public');
+app.use(express.static(publicFolder));
 
-// Check if main.html exists in the lowercase "public" folder
-if (fs.existsSync(mainFile)) {
-  console.log("Found main.html at:", mainFile);
-} else {
-  console.log("main.html NOT found at:", mainFile);
-}
+// Also serve static files from the project root
+app.use(express.static(__dirname));
 
-// Serve static files from the lowercase "public" folder
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Define the root route to serve main.html explicitly
+// Define root route: serve main.html from the public folder
+const mainFile = path.join(publicFolder, 'main.html');
 app.get('/', (req, res) => {
-  res.sendFile(mainFile, (err) => {
-    if (err) {
-      console.error("Error sending main.html:", err);
-      res.status(500).send("Error loading page.");
-    }
-  });
+  if (fs.existsSync(mainFile)) {
+    res.sendFile(mainFile, (err) => {
+      if (err) {
+        console.error("Error sending main.html:", err);
+        res.status(500).send("Error loading page.");
+      }
+    });
+  } else {
+    res.status(404).send("main.html not found");
+  }
+});
+
+// Explicit route for input.html in the project root
+app.get('/input.html', (req, res) => {
+  const inputFile = path.join(__dirname, 'input.html');
+  console.log("Looking for input.html at:", inputFile);
+  if (fs.existsSync(inputFile)) {
+    res.sendFile(inputFile);
+  } else {
+    res.status(404).send("input.html not found");
+  }
 });
 
 // Start the server
