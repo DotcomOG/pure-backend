@@ -4,7 +4,7 @@ import fetch from 'node-fetch';
 import cors from 'cors';
 import { load } from 'cheerio';
 import dotenv from 'dotenv';
-import { Configuration, OpenAIApi } from 'openai';
+import OpenAI from 'openai';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -16,17 +16,16 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Serve static files from the public folder
+// Serve static files from the "public" folder
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Setup OpenAI configuration
-const configuration = new Configuration({
+// Initialize OpenAI using default import (v4+)
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-const openai = new OpenAIApi(configuration);
 
 // Utility: Normalize a URL (prepends "http://" if missing)
 function normalizeUrl(url) {
@@ -51,18 +50,18 @@ app.get('/friendly', async (req, res) => {
     const html = await response.text();
     const $ = load(html);
     
-    // Extract some basic info (modify as needed)
+    // Extract basic info from the page
     const title = $('title').text().trim();
     const metaDesc = $('meta[name="description"]').attr('content') || "No meta description found";
 
     // Build a prompt for dynamic analysis
-    const prompt = `You are an AI SEO expert. Provide a detailed AI SEO analysis summary for the website: ${url}. 
-The site's title is "${title}" and the meta description is "${metaDesc}". 
+    const prompt = `You are an AI SEO expert. Provide a detailed AI SEO analysis summary for the website: ${url}.
+The site's title is "${title}" and its meta description is "${metaDesc}". 
 Give actionable recommendations specific to AI SEO for engines such as ChatGPT, Claude, Google Gemini, Microsoft Copilot, and Jasper AI.
-Use professional tone with creative insights and a wow factor.`;
+Use a professional tone with creative insights and a wow factor.`;
 
-    // Request completion from OpenAI
-    const aiResponse = await openai.createCompletion({
+    // Request completion from OpenAI using completions.create()
+    const aiResponse = await openai.completions.create({
       model: "text-davinci-003",
       prompt: prompt,
       max_tokens: 200,
@@ -77,7 +76,7 @@ Use professional tone with creative insights and a wow factor.`;
   }
 });
 
-// Root route: serves main.html from public folder (adjust as needed)
+// Root route: serves main.html from the public folder
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'main.html'));
 });
