@@ -1,5 +1,4 @@
 import express from 'express';
-import fetch from 'node-fetch';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
@@ -9,56 +8,79 @@ import OpenAI from 'openai';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3001;
 
+// Set __dirname for ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Log the __dirname for debugging
 console.log("Server __dirname:", __dirname);
 
-// Serve static files from the "public" folder
+// Serve static files from the 'public' folder
 const publicDir = path.join(__dirname, 'public');
 console.log("Serving static files from:", publicDir);
 app.use(express.static(publicDir));
 
-// Root route: serve main.html from the public folder
-app.get('/', (req, res) => {
-  const mainFile = path.join(publicDir, 'main.html');
-  res.sendFile(mainFile, (err) => {
+// Parse incoming JSON and URL-encoded payloads
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Initialize OpenAI with the API key from .env
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
+
+// Route to serve the input page (e.g., for URL submission)
+app.get('/input.html', (req, res) => {
+  res.sendFile(path.join(publicDir, 'input.html'), (err) => {
     if (err) {
-      console.error("Error sending main.html:", err);
-      res.status(500).send("Error loading page.");
+      console.error("Error sending input.html:", err);
+      res.status(500).send("Error loading input page.");
     }
   });
 });
 
-// Initialize OpenAI client using default import
-const openai = new OpenAI({
-  apiKey: process.env.OPEN_AI_KEY,
-});
-
-// /friendly endpoint: performs dynamic AI SEO analysis using ChatGPT
+// Example route: /friendly?url=<site>
+// This route returns a simple placeholder report and uses the OpenAI chat completions API
 app.get('/friendly', async (req, res) => {
   const targetUrl = req.query.url;
   if (!targetUrl) {
-    return res.status(400).send("Please provide a 'url' query parameter.");
+    return res.status(400).send('Please provide a ?url= parameter');
   }
-  
-  // Create a prompt for dynamic analysis
-  const prompt = `Analyze the following website for AI SEO strengths and opportunities for improvement: ${targetUrl}. 
-Provide your analysis in bullet points. Reference AI engines such as ChatGPT, Claude, Google Gemini, Microsoft Copilot, and Jasper AI. 
-The response should be impressive and detailed (each bullet 2-5 lines), using the term "AI SEO" throughout.`;
-
+  // For demonstration, we create a prompt that asks ChatGPT to analyze the URL
+  const prompt = `Analyze the following website URL for AI SEO opportunities and provide a detailed analysis: ${targetUrl}`;
   try {
-    const completion = await openai.createCompletion({
-      model: "text-davinci-003",
-      prompt: prompt,
-      max_tokens: 600,
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        { role: "system", content: "You are an expert in AI SEO analysis." },
+        { role: "user", content: prompt }
+      ],
+      temperature: 0.7,
+      max_tokens: 300
     });
-    const analysis = completion.data.choices[0].text.trim();
+    const analysis = completion.choices[0].message.content;
     res.send(`
-      <h1>Dynamic AI SEO Analysis for ${targetUrl}</h1>
-      <div>${analysis}</div>
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="UTF-8" />
+          <title>AI SEO Analysis Report</title>
+          <style>
+            body { font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px; }
+            .container { max-width: 800px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+            h1 { font-family: 'Forum', sans-serif; font-size: 1.8em; color: #333; }
+            p { font-size: 1em; color: #333; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h1>Dynamic AI SEO Analysis for ${targetUrl}</h1>
+            <p>${analysis}</p>
+          </div>
+        </body>
+      </html>
     `);
   } catch (error) {
     console.error("Error generating AI SEO analysis:", error);
@@ -66,7 +88,17 @@ The response should be impressive and detailed (each bullet 2-5 lines), using th
   }
 });
 
-// Start the Express server
+// Define the root route to serve main.html from the public folder
+app.get('/', (req, res) => {
+  res.sendFile(path.join(publicDir, 'main.html'), (err) => {
+    if (err) {
+      console.error("Error sending main.html:", err);
+      res.status(500).send("Error loading main page.");
+    }
+  });
+});
+
+// Start the server
 app.listen(PORT, () => {
   console.log(`Express server is running on port ${PORT}`);
 });
