@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Enter URL</title>
+    <style>
+      /* Basic reset and centering */
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        font-family: Arial, sans-serif;
+      }
+      .container {
+        text-align: center;
+      }
+      input[type="url"] {
+        width: 300px;
+        padding: 10px;
+        font-size: 16px;
+        box-sizing: border-box;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        margin-left: 10px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <form id="urlForm" action="/friendly" method="GET">
+        <input type="url" name="url" placeholder="Enter website URL" required />
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+  </body>
+</html>
