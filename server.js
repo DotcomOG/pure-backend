@@ -36,7 +36,7 @@ function normalizeUrl(url) {
   return trimmed;
 }
 
-// /friendly endpoint: generates dynamic AI SEO analysis using OpenAI
+// /friendly endpoint: generates dynamic AI SEO analysis using OpenAI Chat API
 app.get('/friendly', async (req, res) => {
   const targetUrl = req.query.url;
   if (!targetUrl) {
@@ -56,23 +56,22 @@ app.get('/friendly', async (req, res) => {
 
     // Build a prompt for the dynamic analysis
     const prompt = `You are an AI SEO expert. Provide a detailed AI SEO analysis summary for the website: ${url}.
-The site's title is "${title}" and its meta description is "${metaDesc}". 
+The site's title is "${title}" and its meta description is "${metaDesc}".
 Give actionable recommendations specific to AI SEO for engines such as ChatGPT, Claude, Google Gemini, Microsoft Copilot, and Jasper AI.
 Use a professional tone with creative insights and a wow factor.`;
 
-    // Request completion from OpenAI
-    const aiResponse = await openai.completions.create({
-      model: "text-davinci-003",
-      prompt: prompt,
+    // Request a chat completion using the new model
+    const chatResponse = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [{ role: "system", content: prompt }],
       max_tokens: 200,
       temperature: 0.7,
     });
-    const analysis = aiResponse.data.choices[0].text.trim();
 
+    const analysis = chatResponse.data.choices[0].message.content.trim();
     res.send(analysis);
   } catch (error) {
     console.error("Error generating dynamic AI SEO analysis:", error);
-    // Send the error message in the response for debugging (remove in production)
     res.status(500).send("Error generating dynamic AI SEO analysis: " + error.message);
   }
 });
