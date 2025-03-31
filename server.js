@@ -4,7 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
-import { Configuration, OpenAIApi } from 'openai';
+import OpenAI from 'openai';
 
 dotenv.config();
 
@@ -32,11 +32,10 @@ app.get('/', (req, res) => {
   });
 });
 
-// Initialize OpenAI API client using key from .env (ensure OPEN_AI_KEY is defined)
-const configuration = new Configuration({
+// Initialize OpenAI client using default import
+const openai = new OpenAI({
   apiKey: process.env.OPEN_AI_KEY,
 });
-const openai = new OpenAIApi(configuration);
 
 // /friendly endpoint: performs dynamic AI SEO analysis using ChatGPT
 app.get('/friendly', async (req, res) => {
@@ -45,11 +44,10 @@ app.get('/friendly', async (req, res) => {
     return res.status(400).send("Please provide a 'url' query parameter.");
   }
   
-  // Create a prompt for the dynamic analysis
+  // Create a prompt for dynamic analysis
   const prompt = `Analyze the following website for AI SEO strengths and opportunities for improvement: ${targetUrl}. 
-Provide your analysis in bullet points, include at least 3-5 points for strengths and 20-50 points for opportunities. 
-Reference AI engines such as ChatGPT, Claude, Google Gemini, Microsoft Copilot, and Jasper AI in your recommendations. 
-The response should be impressive, detailed (each bullet should be 2-5 lines), and use the phrase "AI SEO" throughout.`;
+Provide your analysis in bullet points. Reference AI engines such as ChatGPT, Claude, Google Gemini, Microsoft Copilot, and Jasper AI. 
+The response should be impressive and detailed (each bullet 2-5 lines), using the term "AI SEO" throughout.`;
 
   try {
     const completion = await openai.createCompletion({
