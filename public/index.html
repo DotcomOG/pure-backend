@@ -231,6 +231,50 @@
       }
     </style>
     <script>
+document.addEventListener("DOMContentLoaded", function() {
+  const queryParams = new URLSearchParams(window.location.search);
+  const inspectedUrl = queryParams.get("url") || "https://example.com";
+
+  document.getElementById("inspected-url").textContent = inspectedUrl;
+
+  fetch("/friendly?url=" + encodeURIComponent(inspectedUrl))
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById("score-percentage").textContent = data.score + "%";
+      document.getElementById("score-marker").style.left = data.score + "%";
+
+      // Superpowers - separate items
+      const spList = document.getElementById("superpowers-list");
+      spList.innerHTML = ""; 
+      data.ai_superpowers.forEach(item => {
+        const li = document.createElement("li");
+        li.innerHTML = `✅ <strong>${item.title}</strong> (${item.explanation})`;
+        spList.appendChild(li);
+      });
+
+      // Opportunities - separate items
+      const oppList = document.getElementById("opportunities-list");
+      oppList.innerHTML = "";
+      data.ai_opportunities.forEach(item => {
+        const li = document.createElement("li");
+        li.innerHTML = `🚨 <strong>${item.title}</strong> (${item.explanation})`;
+        oppList.appendChild(li);
+      });
+
+      // AI Engine Insights - each engine on a separate line
+      const insightsList = document.getElementById("engine-insights-list");
+      insightsList.innerHTML = "";
+      for (const engine in data.ai_engine_insights) {
+        const li = document.createElement("li");
+        li.innerHTML = `🤖 <strong>${engine}:</strong> ${data.ai_engine_insights[engine]}`;
+        insightsList.appendChild(li);
+      }
+    })
+    .catch(error => {
+      console.error("Error fetching dynamic data:", error);
+    });
+});
+</script>
       // When the form is submitted, save the form data to localStorage for use on the detailed report page
       function handleFormSubmit(event) {
         var form = event.target;
@@ -238,181 +282,6 @@
         localStorage.setItem('reportEmail', form.email.value);
         localStorage.setItem('reportCompany', form.company.value);
       }
-    </script>
-  </head>
-  <body>
-    <!-- HEADER -->
-    <header>
-      <h2>Yoram Ezra Strategies</h2>
-      <nav>
-        <a href="https://yourwixsite.com/home" target="_blank">Home</a>
-        <a href="https://yourwixsite.com/ai-seo" target="_blank">AI SEO Analyzer</a>
-      </nav>
-    </header>
-    <!-- END HEADER SECTION -->
     
-    <!-- CONTAINER SECTION -->
-    <div class="container">
-      <!-- PAGE HEADER STARTS HERE -->
-      <center>
-        <h1>
-          Short AI SEO Analysis<br>
-          <span style="font-size:0.7em; color:#555;">🤖 Powered by ChatGPT 🤖</span>
-        </h1>
-        <div class="header-info">
-          <p>URL inspected: <strong id="inspected-url">https://example.com</strong></p>
-        </div>
-      </center>
-      
-      <!-- SCORE SECTION -->
-      <div class="score-container">
-        <span class="info-icon" title="Click for explanation" onclick="document.getElementById('lightbox').style.display='block';">?</span>
-        <div class="score-label">AI SEO Score:</div>
-        <div class="score-indicator-container">
-          <div class="score-indicator">
-            <div class="score-marker" id="score-marker" style="left:70%;"></div>
-            <span class="score-percentage" id="score-percentage">70%</span>
-          </div>
-        </div>
-      </div>
-      
-      <h2>Your Site's Superpowers</h2>
-      <ul id="superpowers-list">
-        <li>Loading superpowers...</li>
-      </ul>
-      
-      <h2>Opportunities for an AI Boost</h2>
-      <ul id="opportunities-list">
-        <li>Loading opportunities...</li>
-      </ul>
-      
-      <!-- AI ENGINE INSIGHTS -->
-      <h2>AI Engine Insights</h2>
-      <ul id="engine-insights-list">
-        <li>Loading insights...</li>
-      </ul>
-      
-      <!-- FORM SECTION -->
-      <div class="form-container" id="contactForm" style="margin-top:20px; font-size:0.9em;">
-        <p>To receive your full, detailed AI SEO report, please provide your information below:</p>
-        <form action="/detailed" method="POST" onsubmit="handleFormSubmit(event);">
-          <input type="hidden" name="url" value="https://example.com" />
-          <!-- Row 1: Name and Email -->
-          <div class="form-row" style="display:flex; gap:10px; margin-bottom:10px;">
-            <div style="flex:1; display:flex; flex-direction:column;">
-              <label for="name" style="margin-bottom:4px;">Name*</label>
-              <input type="text" name="name" id="name" required style="padding:8px;" />
-            </div>
-            <div style="flex:1; display:flex; flex-direction:column;">
-              <label for="email" style="margin-bottom:4px;">Email*</label>
-              <input type="email" name="email" id="email" required style="padding:8px;" />
-            </div>
-          </div>
-          <!-- Row 2: Company -->
-          <div class="form-row" style="display:flex; gap:10px; margin-bottom:10px;">
-            <div style="flex:1; display:flex; flex-direction:column;">
-              <label for="company" style="margin-bottom:4px;">Company/Organization</label>
-              <input type="text" name="company" id="company" style="padding:8px;" />
-            </div>
-          </div>
-          <!-- Row 3: Submit Button -->
-          <div class="form-row" style="display:flex; justify-content:center;">
-            <button type="submit" style="padding:10px 20px;">Get Full Report</button>
-          </div>
-        </form>
-      </div>
-      
-      <div class="footer">
-        Made by Yoram Ezra Strategies<br>
-        🤖 Powered by ChatGPT 🤖
-      </div>
-    </div>
-    
-    <!-- LIGHTBOX FOR AI SEO SCORE EXPLANATION -->
-    <div id="lightbox">
-      <div id="lightbox-content">
-        <span id="lightbox-close" onclick="document.getElementById('lightbox').style.display='none';">X Close</span>
-        <h2>AI SEO Score Explanation</h2>
-        <div class="lightbox-scale">
-          <span><strong>0-20%</strong><br>Critical</span>
-          <span><strong>21-40%</strong><br>Severe</span>
-          <span><strong>41-60%</strong><br>Moderate</span>
-          <span><strong>61-80%</strong><br>Minor</span>
-          <span><strong>81-100%</strong><br>Excellent</span>
-        </div>
-        <p>
-          <strong>Critical:</strong> Missing essential elements (title, meta description, canonical, H1).<br>
-          <strong>Severe:</strong> Major issues that severely impact AI SEO performance.<br>
-          <strong>Moderate:</strong> Noticeable issues affecting AI SEO performance.<br>
-          <strong>Minor:</strong> Slight issues with minimal impact.<br>
-          <strong>Excellent:</strong> Optimal performance with trivial issues.
-        </p>
-      </div>
-    </div>
-    
-    <!-- DYNAMIC DATA FETCH SCRIPT WITH QUERY PARAMETER -->
-    <script>
-      document.addEventListener("DOMContentLoaded", function() {
-        // Extract the inspected URL from the query parameter; default to "https://example.com" if not provided.
-        const queryParams = new URLSearchParams(window.location.search);
-        const inspectedUrl = queryParams.get("url") || "https://example.com";
-        
-        // Update the inspected URL element on the page.
-        document.getElementById("inspected-url").textContent = inspectedUrl;
-        
-        // Build the API endpoint URL using the inspected URL.
-        const apiUrl = "/friendly?url=" + encodeURIComponent(inspectedUrl);
-        
-        // Fetch dynamic data from the API.
-        fetch(apiUrl)
-          .then(response => response.json())
-          .then(data => {
-            // Update score percentage and marker position.
-            document.getElementById("score-percentage").textContent = data.score + "%";
-            document.getElementById("score-marker").style.left = data.score + "%";
-            
-            // Combine Superpowers into one line.
-            const spList = document.getElementById("superpowers-list");
-            if (data.ai_superpowers && data.ai_superpowers.length > 0) {
-              const spCombined = data.ai_superpowers
-                .map(item => "✅ " + item.title + " (" + item.explanation + ")")
-                .join("; ");
-              spList.innerHTML = "<li>" + spCombined + "</li>";
-            } else {
-              spList.innerHTML = "<li>No superpowers identified.</li>";
-            }
-            
-            // Combine Opportunities into one line.
-            const oppList = document.getElementById("opportunities-list");
-            if (data.ai_opportunities && data.ai_opportunities.length > 0) {
-              const oppCombined = data.ai_opportunities
-                .map(item => "🚨 " + item.title + " (" + item.explanation + ")")
-                .join("; ");
-              oppList.innerHTML = "<li>" + oppCombined + "</li>";
-            } else {
-              oppList.innerHTML = "<li>No opportunities identified.</li>";
-            }
-            
-            // Combine AI Engine Insights into one paragraph.
-            const insightsList = document.getElementById("engine-insights-list");
-            if (data.ai_engine_insights && Object.keys(data.ai_engine_insights).length > 0) {
-              let insightsCombined = "";
-              for (const engine in data.ai_engine_insights) {
-                insightsCombined += "🤖 " + engine + ": " + data.ai_engine_insights[engine] + "; ";
-              }
-              insightsCombined = insightsCombined.trim();
-              if (insightsCombined.endsWith(";")) {
-                insightsCombined = insightsCombined.slice(0, -1);
-              }
-              insightsList.innerHTML = "<li>" + insightsCombined + "</li>";
-            } else {
-              insightsList.innerHTML = "<li>No insights available.</li>";
-            }
-          })
-          .catch(error => {
-            console.error("Error fetching dynamic data:", error);
-          });
-      });
-    </script>
   </body>
 </html>
