@@ -2,47 +2,42 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000;
 
-console.log("Starting server...");
-
-// Serve static files from the "public" folder
+// Serve static files from the "public" directory
 app.use(express.static('public'));
 
-// Log every request for debugging
-app.use((req, res, next) => {
-  console.log(`Received ${req.method} request for ${req.url}`);
-  next();
-});
-
-// API endpoint returning JSON data
+// Dynamic /friendly API endpoint that properly uses the URL query parameter
 app.get('/friendly', (req, res) => {
-  console.log("Handling /friendly request");
+  const inspectedUrl = req.query.url || "https://example.com";
+
+  // This is the dynamically generated JSON response:
   const data = {
-    url: "https://adl.org",
-    score: 60,
+    url: inspectedUrl,
+    score: 75, // Static example score (later replace with dynamic calculation)
     ai_superpowers: [
       {
-        title: "User Experience Optimization",
-        explanation: "The site is currently redirecting users, impacting their experience negatively."
+        title: "Clear Navigation",
+        explanation: "The site navigation is clear and effective, improving user experience and SEO."
       }
     ],
     ai_opportunities: [
       {
-        title: "Content Optimization",
-        explanation: "There is no visible content on the page, which could be optimized for better search engine visibility."
+        title: "Improve Load Speed",
+        explanation: "Load speed can be optimized to enhance user experience and improve ranking."
       }
     ],
     ai_engine_insights: {
-      ChatGPT: "No visible content to analyze.",
-      Claude: "No visible content to analyze.",
-      "Google Gemini": "No visible content to analyze.",
-      "Microsoft Copilot": "No visible content to analyze.",
-      "Jasper AI": "No visible content to analyze."
+      "ChatGPT": `The content on ${inspectedUrl} is well-structured for readability.`,
+      "Claude": `The site ${inspectedUrl} could leverage more visuals for engagement.`,
+      "Google Gemini": `${inspectedUrl} has strong keyword relevance.`,
+      "Microsoft Copilot": `Navigation enhancements are recommended for ${inspectedUrl}.`,
+      "Jasper AI": `${inspectedUrl} would benefit from interactive content features.`
     }
   };
+
   res.json(data);
 });
 
-// Start the server
+// Start server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
