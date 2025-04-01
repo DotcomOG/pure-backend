@@ -1,4 +1,8 @@
 // server.js
+// ------------------------------
+// 🚀 AI SEO Analysis Server
+// ------------------------------
+
 import express from 'express';
 import fetch from 'node-fetch';
 import cors from 'cors';
@@ -9,6 +13,10 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { URL } from 'url';
 
+// ------------------------------
+// 🔧 Init
+// ------------------------------
+
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -17,16 +25,33 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(express.static(path.join(__dirname, 'public')));
+// ------------------------------
+// 🔐 Confirm OpenAI Key Loaded
+// ------------------------------
+
+console.log("🔑 OpenAI Key Loaded:", process.env.OPENAI_API_KEY?.slice(0, 10) + "...");
+
+// ------------------------------
+// 🚪 Middleware
+// ------------------------------
+
 app.use(cors());
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// ------------------------------
+// 🧠 OpenAI Init
+// ------------------------------
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// --- CRAWLER UTILITY ---
+// ------------------------------
+// 🕸️ Crawler Utility Function
+// ------------------------------
+
 async function crawlSite(startUrl, maxPages = 100) {
   const visited = new Set();
   const queue = [startUrl];
@@ -64,33 +89,31 @@ async function crawlSite(startUrl, maxPages = 100) {
       pages.push({ url: currentUrl, title, metaDesc, h1 });
       queue.push(...links.filter(l => !visited.has(l)));
     } catch (e) {
-      console.warn(`Failed to crawl ${currentUrl}:`, e.message);
+      console.warn(`⚠️ Failed to crawl ${currentUrl}:`, e.message);
     }
   }
 
   return pages;
 }
 
-// --- FRIENDLY ENDPOINT ---
+// ------------------------------
+// 📊 /friendly - Main Analysis Endpoint
+// ------------------------------
+
 app.get('/friendly', async (req, res) => {
   const targetUrl = req.query.url;
-  if (!targetUrl) {
-    return res.status(400).send("Missing URL parameter");
-  }
+  if (!targetUrl) return res.status(400).send("Missing URL parameter");
 
   const url = /^https?:\/\//i.test(targetUrl) ? targetUrl : `http://${targetUrl}`;
 
   try {
     const pages = await crawlSite(url);
-
-    // Create prompt for OpenAI to return structured JSON
     const siteSummary = pages.slice(0, 5).map(p =>
       `Page: ${p.url}\nTitle: ${p.title}\nMeta: ${p.metaDesc}\nH1: ${p.h1}`
     ).join("\n\n");
 
     const prompt = `
-You are an AI SEO consultant generating a structured JSON report.
-Analyze this website from an AI SEO perspective. Use the following format:
+You are an AI SEO consultant. Analyze the following site and return a JSON report in this format:
 
 {
   "url": "...",
@@ -106,7 +129,7 @@ Analyze this website from an AI SEO perspective. Use the following format:
   }
 }
 
-Focus on AI SEO signals. Here are some page samples:\n\n${siteSummary}
+Use the sample pages below:\n\n${siteSummary}
 `;
 
     const chatResponse = await openai.chat.completions.create({
@@ -116,21 +139,28 @@ Focus on AI SEO signals. Here are some page samples:\n\n${siteSummary}
       max_tokens: 1000,
     });
 
-    const output = chatResponse.choices?.[0]?.message?.content || '{}';
-    const json = JSON.parse(output);
-    res.json(json);
+    const raw = chatResponse.choices?.[0]?.message?.content || '{}';
+    const data = JSON.parse(raw);
+    res.json(data);
 
   } catch (err) {
-    console.error('Error during crawl or AI analysis:', err.message);
+    console.error('❌ Error:', err.message);
     res.status(500).send('Internal Server Error: ' + err.message);
   }
 });
 
-// --- STATIC ROUTES ---
+// ------------------------------
+// 🏠 Root Route
+// ------------------------------
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'main.html'));
 });
 
+// ------------------------------
+// 🚀 Start Server
+// ------------------------------
+
 app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
+  console.log(`✅ Server running on http://localhost:${PORT}`);
 });
