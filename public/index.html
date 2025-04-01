@@ -94,7 +94,7 @@
         bottom: 0;
         width: 2px;
         background: black;
-        left: 70%; /* adjust based on score */
+        left: 70%; /* initial value; will update dynamically */
       }
       .score-percentage {
         position: absolute;
@@ -196,6 +196,7 @@
         max-width: 500px;
         border-radius: 8px;
         position: relative;
+        text-align: center;
       }
       #lightbox-close {
         position: absolute;
@@ -265,7 +266,6 @@
           <p>URL inspected: <strong id="inspected-url">https://example.com</strong></p>
         </div>
       </center>
-   
       
       <!-- SCORE SECTION -->
       <div class="score-container">
@@ -273,163 +273,57 @@
         <div class="score-label">AI SEO Score:</div>
         <div class="score-indicator-container">
           <div class="score-indicator">
-            <div class="score-marker" style="left:70%;"></div>
-            <span class="score-percentage">70%</span>
+            <div class="score-marker" id="score-marker" style="left:70%;"></div>
+            <span class="score-percentage" id="score-percentage">70%</span>
           </div>
         </div>
       </div>
       
       <h2>Your Site's Superpowers</h2>
-      <ul>
-        <li>
-          ✅ Canonical tag is present
-          <small class="explanation">
-            Prevents duplicate content by signaling the main page version.<br>
-            Directs all AI SEO value to the primary URL.
-          </small>
-        </li>
-        <li>
-          ✅ H1 tag is present
-          <small class="explanation">
-            Establishes a clear hierarchy for your content.<br>
-            Helps AI engines understand your page structure.
-          </small>
-        </li>
-        <li>
-          ✅ All images have alt text
-          <small class="explanation">
-            Enhances accessibility and informs AI algorithms about image content.<br>
-            Boosts performance in AI-powered image searches.
-          </small>
-        </li>
-        <li>
-          ✅ Mobile-friendly design
-          <small class="explanation">
-            Provides a responsive experience crucial for mobile-first AI indexing.<br>
-            Keeps user experience smooth on all devices.
-          </small>
-        </li>
-        <li>
-          ✅ Fast page load speed
-          <small class="explanation">
-            Reduces bounce rates and improves user engagement.<br>
-            A key factor for strong AI SEO performance.
-          </small>
-        </li>
+      <ul id="superpowers-list">
+        <li>Loading superpowers...</li>
       </ul>
       
       <h2>Opportunities for an AI Boost</h2>
-      <ul>
-        <li>
-          🚨 Title tag length is not optimal
-          <small class="explanation">
-            Title should be 30-60 characters long to summarize your content effectively.<br>
-            Proper length helps AI engines interpret and rank your page.
-          </small>
-        </li>
-        <li>
-          🚨 Missing meta description
-          <small class="explanation">
-            A compelling meta description is vital for attracting clicks in AI-powered search results.<br>
-            Its absence diminishes your page’s appeal to AI algorithms.
-          </small>
-        </li>
-        <li>
-          🚨 Broken links detected
-          <small class="explanation">
-            Broken internal or external links disrupt navigation and confuse AI crawlers.<br>
-            They lower site credibility and impair AI SEO performance.
-          </small>
-        </li>
-        <li>
-          🚨 Slow server response time
-          <small class="explanation">
-            Delays frustrate users and negatively impact AI SEO rankings.<br>
-            Optimizing speed is essential for improved AI performance.
-          </small>
-        </li>
-        <li>
-          🚨 No sitemap submitted
-          <small class="explanation">
-            A sitemap is crucial for AI engines to discover all pages.<br>
-            Its absence can lead to incomplete indexing.
-          </small>
-        </li>
-        <li>
-          🚨 Keyword stuffing detected
-          <small class="explanation">
-            Overuse of keywords can trigger penalties from AI algorithms.<br>
-            Maintain a natural flow for optimal AI SEO.
-          </small>
-        </li>
+      <ul id="opportunities-list">
+        <li>Loading opportunities...</li>
       </ul>
       
       <!-- AI ENGINE INSIGHTS -->
       <h2>AI Engine Insights</h2>
-      <ul>
-        <li>
-          🤖 <strong>ChatGPT:</strong> Leverages natural language processing to refine content and optimize semantic structure.
-        </li>
-        <li>
-          🤖 <strong>Claude (Anthropic):</strong> Excels at understanding context and conversation, ensuring clarity for AI analysis.
-        </li>
-        <li>
-          🤖 <strong>Google Gemini:</strong> Specializes in multimedia interpretation and structured data, enhancing AI SEO for visual content.
-        </li>
-        <li>
-          🤖 <strong>Microsoft Copilot:</strong> Integrates AI insights into content strategy for improved performance and clarity.
-        </li>
-        <li>
-          🤖 <strong>Jasper AI:</strong> Focuses on creative content generation and narrative enhancement, ideal for compelling AI SEO storytelling.
-        </li>
+      <ul id="engine-insights-list">
+        <li>Loading insights...</li>
       </ul>
       
-      <!-- FORM -->
-
-
-      <!-- Updated Form Section for the Index Page -->
-<div class="form-container" id="contactForm" style="margin-top:20px; font-size:0.9em;">
-  <p>To receive your full, detailed AI SEO report, please provide your information below:</p>
-  <form action="/detailed" method="POST" onsubmit="handleFormSubmit(event);">
-    <input type="hidden" name="url" value="https://example.com" />
-    <!-- Row 1: Name and Email -->
-    <div class="form-row" style="display:flex; gap:10px; margin-bottom:10px;">
-      <div style="flex:1; display:flex; flex-direction:column;">
-        <label for="name" style="margin-bottom:4px;">Name*</label>
-        <input type="text" name="name" id="name" required style="padding:8px;" />
+      <!-- FORM SECTION -->
+      <div class="form-container" id="contactForm" style="margin-top:20px; font-size:0.9em;">
+        <p>To receive your full, detailed AI SEO report, please provide your information below:</p>
+        <form action="/detailed" method="POST" onsubmit="handleFormSubmit(event);">
+          <input type="hidden" name="url" value="https://example.com" />
+          <!-- Row 1: Name and Email -->
+          <div class="form-row" style="display:flex; gap:10px; margin-bottom:10px;">
+            <div style="flex:1; display:flex; flex-direction:column;">
+              <label for="name" style="margin-bottom:4px;">Name*</label>
+              <input type="text" name="name" id="name" required style="padding:8px;" />
+            </div>
+            <div style="flex:1; display:flex; flex-direction:column;">
+              <label for="email" style="margin-bottom:4px;">Email*</label>
+              <input type="email" name="email" id="email" required style="padding:8px;" />
+            </div>
+          </div>
+          <!-- Row 2: Company -->
+          <div class="form-row" style="display:flex; gap:10px; margin-bottom:10px;">
+            <div style="flex:1; display:flex; flex-direction:column;">
+              <label for="company" style="margin-bottom:4px;">Company/Organization</label>
+              <input type="text" name="company" id="company" style="padding:8px;" />
+            </div>
+          </div>
+          <!-- Row 3: Submit Button -->
+          <div class="form-row" style="display:flex; justify-content:center;">
+            <button type="submit" style="padding:10px 20px;">Get Full Report</button>
+          </div>
+        </form>
       </div>
-      <div style="flex:1; display:flex; flex-direction:column;">
-        <label for="email" style="margin-bottom:4px;">Email*</label>
-        <input type="email" name="email" id="email" required style="padding:8px;" />
-      </div>
-    </div>
-    <!-- Row 2: Company and Area of Expertise -->
-    <div class="form-row" style="display:flex; gap:10px; margin-bottom:10px;">
-      <div style="flex:1; display:flex; flex-direction:column;">
-        <label for="company" style="margin-bottom:4px;">Company/Organization</label>
-        <input type="text" name="company" id="company" style="padding:8px;" />
-      </div>
-      <div style="flex:1; display:flex; flex-direction:column;">
-        <!--<label for="expertise" style="margin-bottom:4px;">Area of Expertise</label>
-        <select name="expertise" id="expertise" style="padding:8px;">
-          <option value="">-----</option>
-          <option value="AI & Machine Learning">AI &amp; Machine Learning</option>
-          <option value="Digital Advertising">Digital Advertising</option>
-          <option value="Content Strategy">Content Strategy</option>
-          <option value="Data Analytics">Data Analytics</option>
-          <option value="Brand Management">Brand Management</option>
-        </select> -->
-      </div>
-    </div>
-    <!-- Row 3: Submit Button -->
-    <div class="form-row" style="display:flex; justify-content:center;">
-      <button type="submit" style="padding:10px 20px;">Get Full Report</button>
-    </div>
-  </form>
-</div>
-
-
-      <!-- CONTACT FORM SECTION ENDS HERE -->
       
       <div class="footer">
         Made by Yoram Ezra Solutions<br>
@@ -438,74 +332,71 @@
     </div>
     
     <!-- LIGHTBOX FOR AI SEO SCORE EXPLANATION -->
-  
-<div id="lightbox">
-  <div id="lightbox-content" style="background:#fff; padding:20px; margin:100px auto; width:calc(80% + 40px); max-width:540px; position:relative; border-radius:8px; text-align:center;">
-    <span id="lightbox-close" onclick="document.getElementById('lightbox').style.display='none';" style="cursor:pointer; font-weight:bold; color:#000; position:absolute; top:10px; left:10px;">X Close</span>
-    <h2 style="margin-bottom:10px; font-size:1em; color:#000;">AI SEO Score Explanation</h2>
-    <div style="margin-top:10px;">
-      <!-- Colored scale bar -->
-      <div style="width:100%; height:10px; border-radius:5px; background: linear-gradient(to right, red, yellow, green); position: relative;">
-        <div style="position:absolute; top:0; bottom:0; width:2px; background:black; left:73%;"></div>
-      </div>
-      <!-- Percentage labels -->
-      <div style="text-align:center; margin-top:5px; font-size:0.8em; color:#000;">
-        <span style="display:inline-block; width:18%;">0-20%</span>
-        <span style="display:inline-block; width:18%;">21-40%</span>
-        <span style="display:inline-block; width:18%;">41-60%</span>
-        <span style="display:inline-block; width:18%;">61-80%</span>
-        <span style="display:inline-block; width:18%;">81-100%</span>
-      </div>
-      <!-- Description labels -->
-      <div style="text-align:center; margin-top:5px; font-size:0.8em; color:#000;">
-        <span style="display:inline-block; width:18%;">Critical</span>
-        <span style="display:inline-block; width:18%;">Severe</span>
-        <span style="display:inline-block; width:18%;">Moderate</span>
-        <span style="display:inline-block; width:18%;">Minor</span>
-        <span style="display:inline-block; width:18%;">Excellent</span>
-      </div>
-    </div>
-    <!-- Detailed explanations -->
-    <p style="text-align:left; margin-top:10px; font-size:0.8em; color:#000;">
-      <strong>Critical:</strong> Missing essential elements (title, meta description, canonical, H1).<br>
-      <strong>Severe:</strong> Major issues that severely impact AI SEO performance.<br>
-      <strong>Moderate:</strong> Noticeable issues affecting AI SEO performance.<br>
-      <strong>Minor:</strong> Slight issues with minimal impact.<br>
-      <strong>Excellent:</strong> Optimal performance with trivial issues.
-    </p>
-  </div>
-</div>
-<!--
     <div id="lightbox">
       <div id="lightbox-content">
-        <span id="lightbox-close" onclick="document.getElementById('lightbox').style.display='none';">Close</span>
+        <span id="lightbox-close" onclick="document.getElementById('lightbox').style.display='none';">X Close</span>
         <h2>AI SEO Score Explanation</h2>
-        <div class="score-indicator-container" style="width:100%; margin-bottom:10px;">
-          <div class="score-indicator" style="width:100%; height:10px; border-radius:5px;">
-            <div class="score-marker" style="height:10px; left:70%;"></div>
-            <span class="score-percentage" style="line-height:10px; font-size:0.8em;">70%</span>
-          </div>
-        </div>
         <div class="lightbox-scale">
-          <span><strong>0-20%</strong> Critical</span>
-          <span><strong>21-40%</strong> Severe</span>
-          <span><strong>41-60%</strong> Moderate</span>
-          <span><strong>61-80%</strong> Minor</span>
-          <span><strong>81-100%</strong> Excellent</span>
+          <span><strong>0-20%</strong><br>Critical</span>
+          <span><strong>21-40%</strong><br>Severe</span>
+          <span><strong>41-60%</strong><br>Moderate</span>
+          <span><strong>61-80%</strong><br>Minor</span>
+          <span><strong>81-100%</strong><br>Excellent</span>
         </div>
+        <p>
+          <strong>Critical:</strong> Missing essential elements (title, meta description, canonical, H1).<br>
+          <strong>Severe:</strong> Major issues that severely impact AI SEO performance.<br>
+          <strong>Moderate:</strong> Noticeable issues affecting AI SEO performance.<br>
+          <strong>Minor:</strong> Slight issues with minimal impact.<br>
+          <strong>Excellent:</strong> Optimal performance with trivial issues.
+        </p>
       </div>
     </div>
     
--->
-
+    <!-- DYNAMIC DATA FETCH SCRIPT -->
     <script>
-      // When the form is submitted, save the form data to localStorage for use on the detailed report page
-      function handleFormSubmit(event) {
-        var form = event.target;
-        localStorage.setItem('reportName', form.name.value);
-        localStorage.setItem('reportEmail', form.email.value);
-        localStorage.setItem('reportCompany', form.company.value);
-      }
+      document.addEventListener("DOMContentLoaded", function() {
+        fetch("/friendly")
+          .then(response => response.json())
+          .then(data => {
+            // Update inspected URL
+            document.getElementById("inspected-url").textContent = data.url;
+            
+            // Update score percentage and marker position
+            document.getElementById("score-percentage").textContent = data.score + "%";
+            document.getElementById("score-marker").style.left = data.score + "%";
+            
+            // Update Superpowers list
+            const spList = document.getElementById("superpowers-list");
+            spList.innerHTML = "";
+            data.ai_superpowers.forEach(item => {
+              const li = document.createElement("li");
+              li.innerHTML = "✅ " + item.title + "<br><small class='explanation'>" + item.explanation + "</small>";
+              spList.appendChild(li);
+            });
+            
+            // Update Opportunities list
+            const oppList = document.getElementById("opportunities-list");
+            oppList.innerHTML = "";
+            data.ai_opportunities.forEach(item => {
+              const li = document.createElement("li");
+              li.innerHTML = "🚨 " + item.title + "<br><small class='explanation'>" + item.explanation + "</small>";
+              oppList.appendChild(li);
+            });
+            
+            // Update AI Engine Insights list
+            const insightsList = document.getElementById("engine-insights-list");
+            insightsList.innerHTML = "";
+            for (const engine in data.ai_engine_insights) {
+              const li = document.createElement("li");
+              li.innerHTML = "🤖 <strong>" + engine + ":</strong> " + data.ai_engine_insights[engine];
+              insightsList.appendChild(li);
+            }
+          })
+          .catch(error => {
+            console.error("Error fetching dynamic data:", error);
+          });
+      });
     </script>
   </body>
 </html>
