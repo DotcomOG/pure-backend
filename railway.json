@@ -1,9 +1,0 @@
-{
-  "build": {
-    "rootDir": ".",
-    "cmd": "npm install && npm run build"
-  },
-  "start": {
-    "cmd": "npm start"
-  }
-}

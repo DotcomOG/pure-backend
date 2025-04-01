@@ -116,8 +116,6 @@
         margin: 10px 0;
       }
       .explanation {
-        display: block;
-        margin-left: 20px;
         font-size: 0.9em;
         font-weight: 300;
         color: #666;
@@ -160,7 +158,6 @@
         flex: 2;
         min-width: 200px;
       }
-      /* Merge Company and Button on same line */
       .form-row.company-and-submit {
         display: flex;
         align-items: center;
@@ -246,7 +243,7 @@
   <body>
     <!-- HEADER -->
     <header>
-      <h2>Yoram Ezra Solutions</h2>
+      <h2>Yoram Ezra Strategies</h2>
       <nav>
         <a href="https://yourwixsite.com/home" target="_blank">Home</a>
         <a href="https://yourwixsite.com/ai-seo" target="_blank">AI SEO Analyzer</a>
@@ -259,7 +256,7 @@
       <!-- PAGE HEADER STARTS HERE -->
       <center>
         <h1>
-          Detailed AI SEO Analysis<br>
+          Short AI SEO Analysis<br>
           <span style="font-size:0.7em; color:#555;">🤖 Powered by ChatGPT 🤖</span>
         </h1>
         <div class="header-info">
@@ -326,7 +323,7 @@
       </div>
       
       <div class="footer">
-        Made by Yoram Ezra Solutions<br>
+        Made by Yoram Ezra Strategies<br>
         🤖 Powered by ChatGPT 🤖
       </div>
     </div>
@@ -374,31 +371,42 @@
             document.getElementById("score-percentage").textContent = data.score + "%";
             document.getElementById("score-marker").style.left = data.score + "%";
             
-            // Update the Superpowers list.
+            // Combine Superpowers into one line.
             const spList = document.getElementById("superpowers-list");
-            spList.innerHTML = "";
-            data.ai_superpowers.forEach(item => {
-              const li = document.createElement("li");
-              li.innerHTML = "✅ " + item.title + "<br><small class='explanation'>" + item.explanation + "</small>";
-              spList.appendChild(li);
-            });
+            if (data.ai_superpowers && data.ai_superpowers.length > 0) {
+              const spCombined = data.ai_superpowers
+                .map(item => "✅ " + item.title + " (" + item.explanation + ")")
+                .join("; ");
+              spList.innerHTML = "<li>" + spCombined + "</li>";
+            } else {
+              spList.innerHTML = "<li>No superpowers identified.</li>";
+            }
             
-            // Update the Opportunities list.
+            // Combine Opportunities into one line.
             const oppList = document.getElementById("opportunities-list");
-            oppList.innerHTML = "";
-            data.ai_opportunities.forEach(item => {
-              const li = document.createElement("li");
-              li.innerHTML = "🚨 " + item.title + "<br><small class='explanation'>" + item.explanation + "</small>";
-              oppList.appendChild(li);
-            });
+            if (data.ai_opportunities && data.ai_opportunities.length > 0) {
+              const oppCombined = data.ai_opportunities
+                .map(item => "🚨 " + item.title + " (" + item.explanation + ")")
+                .join("; ");
+              oppList.innerHTML = "<li>" + oppCombined + "</li>";
+            } else {
+              oppList.innerHTML = "<li>No opportunities identified.</li>";
+            }
             
-            // Update the AI Engine Insights list.
+            // Combine AI Engine Insights into one paragraph.
             const insightsList = document.getElementById("engine-insights-list");
-            insightsList.innerHTML = "";
-            for (const engine in data.ai_engine_insights) {
-              const li = document.createElement("li");
-              li.innerHTML = "🤖 <strong>" + engine + ":</strong> " + data.ai_engine_insights[engine];
-              insightsList.appendChild(li);
+            if (data.ai_engine_insights && Object.keys(data.ai_engine_insights).length > 0) {
+              let insightsCombined = "";
+              for (const engine in data.ai_engine_insights) {
+                insightsCombined += "🤖 " + engine + ": " + data.ai_engine_insights[engine] + "; ";
+              }
+              insightsCombined = insightsCombined.trim();
+              if (insightsCombined.endsWith(";")) {
+                insightsCombined = insightsCombined.slice(0, -1);
+              }
+              insightsList.innerHTML = "<li>" + insightsCombined + "</li>";
+            } else {
+              insightsList.innerHTML = "<li>No insights available.</li>";
             }
           })
           .catch(error => {

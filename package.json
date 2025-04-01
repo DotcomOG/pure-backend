@@ -1,20 +1,12 @@
 {
   "name": "ai-seo-backend",
   "version": "1.0.0",
-  "type": "module",
-  "private": true,
+  "description": "AI SEO Analysis Tool",
+  "main": "server.js",
   "scripts": {
-    "build": "echo 'No build step needed'",
-    "start": "node server.js",
-    "server": "node server.js"
+    "start": "node server.js"
   },
   "dependencies": {
-    "axios": "^1.8.4",
-    "cheerio": "^1.0.0",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
-    "express": "^4.21.2",
-    "node-fetch": "^3.3.2",
-    "openai": "^4.91.0"
+    "express": "^4.18.2"
   }
 }
