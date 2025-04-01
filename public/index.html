@@ -94,7 +94,7 @@
         bottom: 0;
         width: 2px;
         background: black;
-        left: 70%; /* initial value; will update dynamically */
+        left: 70%; /* initial value; updated dynamically */
       }
       .score-percentage {
         position: absolute;
@@ -353,20 +353,28 @@
       </div>
     </div>
     
-    <!-- DYNAMIC DATA FETCH SCRIPT -->
+    <!-- DYNAMIC DATA FETCH SCRIPT WITH QUERY PARAMETER -->
     <script>
       document.addEventListener("DOMContentLoaded", function() {
-        fetch("/friendly")
+        // Extract the inspected URL from the query parameter; default to "https://example.com" if not provided.
+        const queryParams = new URLSearchParams(window.location.search);
+        const inspectedUrl = queryParams.get("url") || "https://example.com";
+        
+        // Update the inspected URL element on the page.
+        document.getElementById("inspected-url").textContent = inspectedUrl;
+        
+        // Build the API endpoint URL using the inspected URL.
+        const apiUrl = "/friendly?url=" + encodeURIComponent(inspectedUrl);
+        
+        // Fetch dynamic data from the API.
+        fetch(apiUrl)
           .then(response => response.json())
           .then(data => {
-            // Update inspected URL
-            document.getElementById("inspected-url").textContent = data.url;
-            
-            // Update score percentage and marker position
+            // Update score percentage and marker position.
             document.getElementById("score-percentage").textContent = data.score + "%";
             document.getElementById("score-marker").style.left = data.score + "%";
             
-            // Update Superpowers list
+            // Update the Superpowers list.
             const spList = document.getElementById("superpowers-list");
             spList.innerHTML = "";
             data.ai_superpowers.forEach(item => {
@@ -375,7 +383,7 @@
               spList.appendChild(li);
             });
             
-            // Update Opportunities list
+            // Update the Opportunities list.
             const oppList = document.getElementById("opportunities-list");
             oppList.innerHTML = "";
             data.ai_opportunities.forEach(item => {
@@ -384,7 +392,7 @@
               oppList.appendChild(li);
             });
             
-            // Update AI Engine Insights list
+            // Update the AI Engine Insights list.
             const insightsList = document.getElementById("engine-insights-list");
             insightsList.innerHTML = "";
             for (const engine in data.ai_engine_insights) {
