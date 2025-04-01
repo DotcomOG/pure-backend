@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 import OpenAI from 'openai';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { URL } from 'url';
 
 dotenv.config();
 
@@ -16,72 +17,120 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Serve static files from the "public" folder
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Initialize OpenAI (v4+)
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Utility: Normalize a URL (prepends "http://" if missing)
-function normalizeUrl(url) {
-  let trimmed = url.trim();
-  if (!/^https?:\/\//i.test(trimmed)) {
-    trimmed = "http://" + trimmed;
+// --- CRAWLER UTILITY ---
+async function crawlSite(startUrl, maxPages = 100) {
+  const visited = new Set();
+  const queue = [startUrl];
+  const pages = [];
+
+  while (queue.length > 0 && pages.length < maxPages) {
+    const currentUrl = queue.shift();
+    if (visited.has(currentUrl)) continue;
+    visited.add(currentUrl);
+
+    try {
+      const res = await fetch(currentUrl);
+      const html = await res.text();
+      const $ = load(html);
+
+      const title = $('title').text().trim();
+      const metaDesc = $('meta[name="description"]').attr('content') || '';
+      const h1 = $('h1').first().text().trim();
+      const links = [];
+
+      $('a[href]').each((i, el) => {
+        const href = $(el).attr('href');
+        try {
+          const absolute = new URL(href, currentUrl).href;
+          if (
+            absolute.startsWith(startUrl) &&
+            !visited.has(absolute) &&
+            absolute.startsWith('http')
+          ) {
+            links.push(absolute);
+          }
+        } catch (e) {}
+      });
+
+      pages.push({ url: currentUrl, title, metaDesc, h1 });
+      queue.push(...links.filter(l => !visited.has(l)));
+    } catch (e) {
+      console.warn(`Failed to crawl ${currentUrl}:`, e.message);
+    }
   }
-  return trimmed;
+
+  return pages;
 }
 
-// /friendly endpoint: generates dynamic AI SEO analysis using OpenAI Chat API
+// --- FRIENDLY ENDPOINT ---
 app.get('/friendly', async (req, res) => {
   const targetUrl = req.query.url;
   if (!targetUrl) {
     return res.status(400).send("Missing URL parameter");
   }
-  const url = normalizeUrl(targetUrl);
+
+  const url = /^https?:\/\//i.test(targetUrl) ? targetUrl : `http://${targetUrl}`;
+
   try {
-    // Fetch the website content
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
-    const html = await response.text();
-    const $ = load(html);
-    
-    // Extract basic information from the page
-    const title = $('title').text().trim();
-    const metaDesc = $('meta[name="description"]').attr('content') || "No meta description found";
+    const pages = await crawlSite(url);
 
-    // Build a prompt for the dynamic analysis
-    const prompt = `You are an AI SEO expert. Provide a detailed AI SEO analysis summary for the website: ${url}.
-The site's title is "${title}" and its meta description is "${metaDesc}".
-Give actionable recommendations specific to AI SEO for engines such as ChatGPT, Claude, Google Gemini, Microsoft Copilot, and Jasper AI.
-Use a professional tone with creative insights and a wow factor.`;
+    // Create prompt for OpenAI to return structured JSON
+    const siteSummary = pages.slice(0, 5).map(p =>
+      `Page: ${p.url}\nTitle: ${p.title}\nMeta: ${p.metaDesc}\nH1: ${p.h1}`
+    ).join("\n\n");
 
-    // Request a chat completion using the new model
+    const prompt = `
+You are an AI SEO consultant generating a structured JSON report.
+Analyze this website from an AI SEO perspective. Use the following format:
+
+{
+  "url": "...",
+  "score": 0-100,
+  "ai_superpowers": [{ "title": "...", "explanation": "..." }],
+  "ai_opportunities": [{ "title": "...", "explanation": "..." }],
+  "ai_engine_insights": {
+    "ChatGPT": "...",
+    "Claude": "...",
+    "Google Gemini": "...",
+    "Microsoft Copilot": "...",
+    "Jasper AI": "..."
+  }
+}
+
+Focus on AI SEO signals. Here are some page samples:\n\n${siteSummary}
+`;
+
     const chatResponse = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [{ role: "system", content: prompt }],
-      max_tokens: 200,
+      model: 'gpt-3.5-turbo',
+      messages: [{ role: 'user', content: prompt }],
       temperature: 0.7,
+      max_tokens: 1000,
     });
 
-    const analysis = chatResponse.data.choices[0].message.content.trim();
-    res.send(analysis);
-  } catch (error) {
-    console.error("Error generating dynamic AI SEO analysis:", error);
-    res.status(500).send("Error generating dynamic AI SEO analysis: " + error.message);
+    const output = chatResponse.choices?.[0]?.message?.content || '{}';
+    const json = JSON.parse(output);
+    res.json(json);
+
+  } catch (err) {
+    console.error('Error during crawl or AI analysis:', err.message);
+    res.status(500).send('Internal Server Error: ' + err.message);
   }
 });
 
-// Root route: serves main.html from the public folder
+// --- STATIC ROUTES ---
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'main.html'));
 });
 
-// Start the server
 app.listen(PORT, () => {
-  console.log(`Express server is running on port ${PORT}`);
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
