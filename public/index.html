@@ -1,195 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>AI SEO Analysis Summary (Powered by ChatGPT)</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Forum&family=Nunito+Sans:wght@300;400;700&display=swap"
-      rel="stylesheet"
-    />
-    <style>
-      body {
-        font-family: 'Nunito Sans', sans-serif;
-        background: #f9f9f9;
-        margin: 0;
-        padding: 0;
-      }
-      header {
-        text-align: center;
-        padding: 15px 20px;
-        background: #fff;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      }
-      header h2 {
-        font-family: 'Forum', sans-serif;
-        margin: 5px 0;
-      }
-      nav a {
-        margin: 0 10px;
-        text-decoration: none;
-        font-weight: 600;
-        color: #000;
-      }
-      .container {
-        max-width: 700px;
-        margin: 30px auto;
-        background: #fff;
-        padding: 20px 30px;
-        border-radius: 8px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      }
-      h1, h2 {
-        font-family: 'Forum', sans-serif;
-        margin: 20px 0 10px;
-        color: #333;
-      }
-      .score-indicator {
-        width: 100%;
-        height: 20px;
-        background: linear-gradient(to right, red, yellow, green);
-        border-radius: 10px;
-        position: relative;
-      }
-      .score-marker {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        width: 2px;
-        background: black;
-      }
-      .score-percentage {
-        position: absolute;
-        width: 100%;
-        text-align: center;
-        line-height: 20px;
-        color: #000;
-      }
-      ul {
-        list-style: none;
-        padding: 0;
-      }
-      ul li {
-        margin-bottom: 12px;
-        line-height: 1.4;
-      }
-      .form-container input, .form-container button {
-        padding: 8px;
-        width: 100%;
-        box-sizing: border-box;
-      }
-      .footer {
-        margin-top: 20px;
-        text-align: center;
-        font-size: 0.8em;
-        color: #555;
-      }
-      .info-icon {
-        display: inline-block;
-        width: 12px;
-        height: 12px;
-        line-height: 12px;
-        border-radius: 50%;
-        background-color: #007BFF;
-        color: #fff;
-        font-size: 8px;
-        cursor: pointer;
-        margin-right: 4px;
-        text-align: center;
-      }
-    </style>
-  </head>
-  <body>
-    <header>
-      <h2>Yoram Ezra Solutions</h2>
-      <nav>
-        <a href="https://yourwixsite.com/home">Home</a>
-        <a href="https://yourwixsite.com/ai-seo">AI SEO Analyzer</a>
-      </nav>
-    </header>
-    <div class="container">
-      <h1 style="text-align:center;">
-        AI SEO Analysis<br>
-        <span style="font-size:0.7em;">🤖 Powered by ChatGPT 🤖</span>
-      </h1>
-      <p style="text-align:center;">URL inspected: <strong id="inspected-url">https://example.com</strong></p>
+<head>
+  <meta charset="UTF-8">
+  <title>AI SEO Analysis Summary (Powered by ChatGPT)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Forum&family=Nunito+Sans:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Nunito Sans', sans-serif; background: #f9f9f9; margin: 0; padding: 0; }
+    .container { max-width: 700px; margin: 20px auto; padding: 20px 30px; background: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    h1,h2 { font-family: 'Forum', serif; color: #333; }
+    ul { padding: 0; list-style: none; }
+    li { margin-bottom: 10px; line-height:1.4; }
+    .score-indicator { width: 100%; height: 20px; background: linear-gradient(to right, red,yellow,green); border-radius: 10px; position:relative; }
+    .score-marker { position: absolute; width: 2px; background: #000; height:100%; }
+    .score-percentage { position: absolute; width:100%; top:0; text-align:center; }
+    .form-row { display:flex; gap:10px; margin-bottom:10px; }
+    .form-container { width:75%; margin:auto; }
+    .form-container input,button { padding:8px; box-sizing:border-box; width:100%; }
+    .form-container button { margin:20px 0; max-width:200px; }
+    @media (max-width:600px){
+      .form-row{ flex-direction:column; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>AI SEO Analysis <br><small>🤖 Powered by ChatGPT 🤖</small></h1>
+  <p>URL inspected: <strong id="inspected-url">https://example.com</strong></p>
 
-      <h2>AI SEO Score:</h2>
-      <div class="score-indicator">
-        <div class="score-marker" id="score-marker" style="left:75%;"></div>
-        <span class="score-percentage" id="score-percentage">75%</span>
+  <div class="score-indicator">
+    <div class="score-marker" id="score-marker" style="left:75%;"></div>
+    <div class="score-percentage" id="score-percentage">75%</div>
+  </div>
+
+  <h2>Your Site's Superpowers</h2>
+  <ul id="superpowers-list"><li>Loading...</li></ul>
+
+  <h2>Opportunities for an AI Boost</h2>
+  <ul id="opportunities-list"><li>Loading...</li></ul>
+
+  <h2>AI Engine Insights</h2>
+  <ul id="engine-insights-list"><li>Loading...</li></ul>
+
+  <div class="form-container">
+    <p>To receive your full report, enter your details:</p>
+    <form action="/detailed" method="POST">
+      <input type="hidden" name="url" id="hidden-url">
+      <div class="form-row">
+        <input type="text" name="name" placeholder="Name*" required>
+        <input type="email" name="email" placeholder="Email*" required>
       </div>
-
-      <h2>Your Site's Superpowers</h2>
-      <ul id="superpowers-list">
-        <li>Loading...</li>
-      </ul>
-
-      <h2>Opportunities for an AI Boost</h2>
-      <ul id="opportunities-list">
-        <li>Loading...</li>
-      </ul>
-
-      <h2>AI Engine Insights</h2>
-      <ul id="engine-insights-list">
-        <li>Loading...</li>
-      </ul>
-
-      <div class="form-container">
-        <p>To receive your full report, enter your details:</p>
-        <form action="/detailed" method="POST">
-          <input type="hidden" name="url" id="hidden-url" value="">
-          <input type="text" name="name" placeholder="Name*" required><br><br>
-          <input type="email" name="email" placeholder="Email*" required><br><br>
-          <input type="text" name="company" placeholder="Company/Organization"><br><br>
-          <button type="submit">Get Full Report</button>
-        </form>
+      <div class="form-row">
+        <input type="text" name="company" placeholder="Company/Organization">
       </div>
+      <button type="submit">Get Full Report</button>
+    </form>
+  </div>
+</div>
 
-      <div class="footer">
-        Made by Yoram Ezra Strategies<br>
-        🤖 Powered by ChatGPT 🤖
-      </div>
-    </div>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const url = new URLSearchParams(window.location.search).get("url") || "https://example.com";
+    document.getElementById("inspected-url").textContent = url;
+    document.getElementById("hidden-url").value = url;
 
-    <!-- FULLY CORRECTED JAVASCRIPT DYNAMIC LOADING -->
-    <script>
-      document.addEventListener("DOMContentLoaded", function() {
-        const params = new URLSearchParams(window.location.search);
-        const url = params.get("url") || "https://example.com";
-        document.getElementById("inspected-url").textContent = url;
-        document.getElementById("hidden-url").value = url;
+    fetch("/friendly?url=" + encodeURIComponent(url))
+      .then(res => res.json()).then(data => {
+        document.getElementById("score-percentage").textContent = data.score + "%";
+        document.getElementById("score-marker").style.left = data.score + "%";
 
-        fetch("/friendly?url=" + encodeURIComponent(url))
-          .then(res => res.json())
-          .then(data => {
-            document.getElementById("score-percentage").textContent = data.score + "%";
-            document.getElementById("score-marker").style.left = data.score + "%";
-
-            const populateList = (id, items, emoji) => {
-              const list = document.getElementById(id);
-              list.innerHTML = "";
-              items.forEach(item => {
-                const li = document.createElement("li");
-                li.innerHTML = `${emoji} <strong>${item.title}</strong><br>${item.explanation}`;
-                list.appendChild(li);
-              });
-            };
-
-            populateList("superpowers-list", data.ai_superpowers, "✅");
-            populateList("opportunities-list", data.ai_opportunities, "🚨");
-
-            const insightsList = document.getElementById("engine-insights-list");
-            insightsList.innerHTML = "";
-            Object.entries(data.ai_engine_insights).forEach(([engine, insight]) => {
-              const li = document.createElement("li");
-              li.innerHTML = `🤖 <strong>${engine}:</strong> ${insight}`;
-              insightsList.appendChild(li);
-            });
-          })
-          .catch(err => {
-            console.error("Error fetching report:", err);
+        const renderList = (id, items, emoji) => {
+          const list = document.getElementById(id);
+          list.innerHTML = "";
+          items.slice(0,15).forEach(item => {
+            const li = document.createElement("li");
+            li.innerHTML = `${emoji} <strong>${item.title}</strong>: ${item.explanation}`;
+            list.appendChild(li);
           });
-      });
-    </script>
-  </body>
+        };
+
+        renderList("superpowers-list", data.ai_superpowers, "✅");
+        renderList("opportunities-list", data.ai_opportunities, "🚨");
+
+        const insightsList = document.getElementById("engine-insights-list");
+        insightsList.innerHTML = "";
+        Object.entries(data.ai_engine_insights).forEach(([engine, insight]) => {
+          const li = document.createElement("li");
+          li.innerHTML = `🤖 <strong>${engine}</strong>: ${insight}`;
+          insightsList.appendChild(li);
+        });
+      })
+      .catch(err => { console.error("Fetching error:", err); });
+  });
+</script>
+
+</body>
 </html>
