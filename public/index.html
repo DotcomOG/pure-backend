@@ -107,7 +107,7 @@
   <!-- AI SEO SCORE SECTION (animated bar, clickable info icon, and percentage) -->
   <div class="score-container">
     <span class="info-icon" onclick="document.getElementById('lightbox').style.display='block';">?</span>
-    <div>(?) AI SEO Score:</div>
+    <div>AI SEO Score:</div>
     <div class="score-indicator">
       <div id="score-marker" class="score-marker"></div>
       <span class="score-percentage" id="score-percentage">Loading...</span>
@@ -165,23 +165,29 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("inspected-url").textContent = url;
   document.getElementById("hidden-url").value = url;
 
-  /* --- FETCH REPORT DATA --- */
 
 
 /* --- FETCH REPORT DATA (Fixed "undefined%" and Animation) --- */
+
+/* --- FETCH REPORT DATA (Robust Processing State Handling) --- */
 const fetchReport = () => {
-  // Restore animation clearly
   document.getElementById("score-marker").style.animation = 'bounce 2s infinite ease-in-out';
   document.getElementById("score-percentage").textContent = 'Loading...';
 
   fetch(`/friendly?url=${encodeURIComponent(url)}`)
-    .then(res => res.status === 202 ? setTimeout(fetchReport, 3000) : res.json())
+    .then(res => {
+      if (!res.ok) throw new Error(`Network response was not ok (${res.status})`);
+      return res.json();
+    })
     .then(data => {
-      if (!data) return;
-      
-      document.getElementById("waiting-message").style.display = 'none';
+      if (data.status === "processing") {
+        // Report still processing, retry clearly after 3 seconds
+        setTimeout(fetchReport, 3000);
+        return;
+      }
 
-      // Stop the animation explicitly once the data loads
+      // Data is fully loaded, stop animation
+      document.getElementById("waiting-message").style.display = 'none';
       document.getElementById("score-marker").style.animation = 'none';
       document.getElementById("score-marker").style.left = data.score + '%';
       document.getElementById("score-percentage").textContent = data.score + "%";
@@ -193,12 +199,17 @@ const fetchReport = () => {
             <div class="explanation">${i.explanation}</div>
           </li>`).join('');
       };
+
       render("superpowers-list", data.ai_superpowers, "✅");
       render("opportunities-list", data.ai_opportunities, "🚨");
       render("engine-insights-list", Object.entries(data.ai_engine_insights).map(([t, e]) => ({ title: t, explanation: e })), "🤖");
+    })
+    .catch(err => {
+      console.error("Fetch error:", err);
+      document.getElementById("waiting-message").innerHTML = 'Oops! Something went wrong. Please refresh the page.';
     });
 };
-
+fetchReport();
 
   /* --- FORM SUBMIT --- */
   document.getElementById('summaryForm').addEventListener('submit',e=>{
