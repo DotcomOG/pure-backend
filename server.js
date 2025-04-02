@@ -9,11 +9,18 @@ app.use(express.static('public'));
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
+const cache = {};  // Simple in-memory cache
+
 app.get('/friendly', async (req, res) => {
   const url = req.query.url;
 
   if (!url) {
     return res.status(400).json({ error: "URL parameter is required." });
+  }
+
+  // Return cached response if available
+  if (cache[url]) {
+    return res.json(cache[url]);
   }
 
   try {
@@ -43,12 +50,15 @@ app.get('/friendly', async (req, res) => {
           content: `Analyze the following website for SEO opportunities and strengths: ${url}`
         }
       ],
-      temperature: 0.7,
-      max_tokens: 1500,
+      temperature: 0.5,  // Reduced temperature for faster responses
+      max_tokens: 800,   // Reduced tokens for quicker responses
       response_format: { type: "json_object" }
     });
 
     const jsonResponse = JSON.parse(completion.choices[0].message.content);
+
+    // Cache the response
+    cache[url] = jsonResponse;
 
     res.json(jsonResponse);
   } catch (error) {
@@ -58,5 +68,5 @@ app.get('/friendly', async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Dynamic AI SEO backend running on port ${port}`);
+  console.log(`Dynamic AI SEO backend running quickly on port ${port}`);
 });
