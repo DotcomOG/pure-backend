@@ -166,25 +166,39 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("hidden-url").value = url;
 
   /* --- FETCH REPORT DATA --- */
-  const fetchReport = () => {
-    fetch(`/friendly?url=${encodeURIComponent(url)}`)
-      .then(res => res.status === 202 ? setTimeout(fetchReport,3000) : res.json())
-      .then(data => {
-        if (!data) return;
-        document.getElementById("waiting-message").style.display='none';
-        document.getElementById("score-marker").style.animation='none';
-        document.getElementById("score-marker").style.left=data.score+'%';
-        document.getElementById("score-percentage").textContent = data.score + "%";
 
-        const render=(id,items,emoji)=>{
-          document.getElementById(id).innerHTML=items.map(i=>`<li><div class="title">${emoji} ${i.title}</div><div class="explanation">${i.explanation}</div></li>`).join('');
-        };
-        render("superpowers-list",data.ai_superpowers,"✅");
-        render("opportunities-list",data.ai_opportunities,"🚨");
-        render("engine-insights-list",Object.entries(data.ai_engine_insights).map(([t,e])=>({title:t,explanation:e})),"🤖");
-      });
-  };
-  fetchReport();
+
+/* --- FETCH REPORT DATA (Fixed "undefined%" and Animation) --- */
+const fetchReport = () => {
+  // Restore animation clearly
+  document.getElementById("score-marker").style.animation = 'bounce 2s infinite ease-in-out';
+  document.getElementById("score-percentage").textContent = 'Loading...';
+
+  fetch(`/friendly?url=${encodeURIComponent(url)}`)
+    .then(res => res.status === 202 ? setTimeout(fetchReport, 3000) : res.json())
+    .then(data => {
+      if (!data) return;
+      
+      document.getElementById("waiting-message").style.display = 'none';
+
+      // Stop the animation explicitly once the data loads
+      document.getElementById("score-marker").style.animation = 'none';
+      document.getElementById("score-marker").style.left = data.score + '%';
+      document.getElementById("score-percentage").textContent = data.score + "%";
+
+      const render = (id, items, emoji) => {
+        document.getElementById(id).innerHTML = items.map(i => `
+          <li>
+            <div class="title">${emoji} ${i.title}</div>
+            <div class="explanation">${i.explanation}</div>
+          </li>`).join('');
+      };
+      render("superpowers-list", data.ai_superpowers, "✅");
+      render("opportunities-list", data.ai_opportunities, "🚨");
+      render("engine-insights-list", Object.entries(data.ai_engine_insights).map(([t, e]) => ({ title: t, explanation: e })), "🤖");
+    });
+};
+fetchReport();
 
   /* --- FORM SUBMIT --- */
   document.getElementById('summaryForm').addEventListener('submit',e=>{
