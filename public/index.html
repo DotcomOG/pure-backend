@@ -31,6 +31,15 @@
     li .title { font-weight: bold; }
     li .explanation { margin-left: 15px; color: #555; font-size: 0.9em; }
 
+    /* Animated marker while loading */
+@keyframes bounce {
+  0%, 100% { left: 0%; }
+  50% { left: 100%; }
+}
+.loading-animation {
+  animation: bounce 2s infinite;
+}
+
     /* FORM SECTION */
     .form-container { width: 75%; margin: auto; margin-top: 20px; }
     .form-row { display: flex; gap: 10px; margin-bottom: 10px; }
@@ -115,39 +124,57 @@
 <!-- SCRIPT TO LOAD DYNAMIC DATA -->
 <!-- SCRIPT TO LOAD DYNAMIC DATA -->
 <script>
-document.addEventListener("DOMContentLoaded",function(){
-  const url = new URLSearchParams(window.location.search).get("url")||"https://example.com";
-  document.getElementById("inspected-url").textContent=url;
-  document.getElementById("hidden-url").value=url;
+document.addEventListener("DOMContentLoaded", function () {
+  const url = new URLSearchParams(window.location.search).get("url") || "https://example.com";
+  document.getElementById("inspected-url").textContent = url;
 
-  // Display customized loading message
-  const loadingMessage = "Wait while SnipeRank is building your report...";
-  document.getElementById("score-percentage").textContent=loadingMessage;
-  document.getElementById("superpowers-list").innerHTML=`<li>${loadingMessage}</li>`;
-  document.getElementById("opportunities-list").innerHTML=`<li>${loadingMessage}</li>`;
-  document.getElementById("engine-insights-list").innerHTML=`<li>${loadingMessage}</li>`;
+  // Insert waiting message
+  const headerInfo = document.querySelector('.header-info');
+  const waitMsg = document.createElement('p');
+  waitMsg.textContent = "Please wait while SnipeRank is building the report...";
+  waitMsg.id = "waiting-message";
+  headerInfo.appendChild(waitMsg);
 
-  fetch("/friendly?url="+encodeURIComponent(url))
-    .then(res=>res.json())
-    .then(data=>{
-      document.getElementById("score-percentage").textContent=data.score+"%";
-      document.getElementById("score-marker").style.left=data.score+"%";
+  const marker = document.getElementById("score-marker");
+  marker.classList.add("loading-animation");
 
-      const renderList=(id,items,emoji)=>{
-        const list=document.getElementById(id);
-        list.innerHTML="";
-        items.forEach(i=>{
-          const li=document.createElement("li");
-          li.innerHTML=`<div class="title">${emoji} ${i.title}</div><div class="explanation">${i.explanation}</div>`;
-          list.appendChild(li);
-        });
-      };
+  const fetchReport = () => {
+    fetch("/friendly?url=" + encodeURIComponent(url))
+      .then(res => {
+        if (res.status === 202) {
+          setTimeout(fetchReport, 3000); // recheck every 3 seconds
+          return null;
+        }
+        return res.json();
+      })
+      .then(data => {
+        if (!data) return;
 
-      renderList("superpowers-list",data.ai_superpowers,"✅");
-      renderList("opportunities-list",data.ai_opportunities,"🚨");
-      renderList("engine-insights-list",Object.entries(data.ai_engine_insights).map(([title,explanation])=>({title,explanation})),"🤖");
-    })
-    .catch(console.error);
+        // Remove waiting message
+        document.getElementById("waiting-message").remove();
+        marker.classList.remove("loading-animation");
+
+        document.getElementById("score-percentage").textContent = data.score + "%";
+        marker.style.left = data.score + "%";
+
+        const renderList = (id, items, emoji) => {
+          const list = document.getElementById(id);
+          list.innerHTML = "";
+          items.forEach(i => {
+            const li = document.createElement("li");
+            li.innerHTML = `<div class="title">${emoji} ${i.title}</div><div class="explanation">${i.explanation}</div>`;
+            list.appendChild(li);
+          });
+        };
+
+        renderList("superpowers-list", data.ai_superpowers, "✅");
+        renderList("opportunities-list", data.ai_opportunities, "🚨");
+        renderList("engine-insights-list", Object.entries(data.ai_engine_insights).map(([title, explanation]) => ({ title, explanation })), "🤖");
+      })
+      .catch(console.error);
+  };
+
+  fetchReport();
 });
 </script>
 </body>
