@@ -8,20 +8,29 @@ app.use(express.static('public'));
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-const reports = {}; // Store reports by URL
+const reports = {};
 
-async function generateReport(url) {
+async function generateReport(url, detail = "summary") {
   try {
+    const promptDetail = detail === "full" 
+      ? `Provide a highly detailed, sales-oriented SEO audit with:
+        - SEO score (0-100)
+        - 5-10 detailed SEO strengths ("ai_superpowers")
+        - 10-30 detailed SEO weaknesses ("ai_opportunities")
+        - In-depth, actionable insights (5-7 sentences each) from ChatGPT, Claude, Gemini, Copilot, Jasper`
+      : `Provide a brief SEO audit summary with:
+        - SEO score (0-100)
+        - 3-5 brief SEO strengths ("ai_superpowers")
+        - 3-10 brief SEO weaknesses ("ai_opportunities")
+        - Brief insights (2-5 sentences each) from ChatGPT, Claude, Gemini, Copilot, Jasper`;
+
     const completion = await openai.chat.completions.create({
       model: 'gpt-4-turbo',
       messages: [{
         role: 'system',
         content: `
-        Analyze the provided URL deeply and carefully for SEO:
-        - Provide a "score" (0-100)
-        - Give 1-5 detailed strengths ("ai_superpowers")
-        - Give 1-10 detailed weaknesses ("ai_opportunities")
-        - Give clear insights (2-5 sentences) from ChatGPT, Claude, Gemini, Copilot, Jasper
+        Analyze the provided URL for SEO carefully:
+        ${promptDetail}
         Respond ONLY in valid JSON exactly matching:
         {
           "url": "<provided-url>",
@@ -35,36 +44,37 @@ async function generateReport(url) {
         content: `Analyze this site: ${url}`
       }],
       temperature: 0.5,
-      max_tokens: 1000,
+      max_tokens: detail === "full" ? 2000 : 1000,
       response_format: { type: "json_object" }
     });
 
-    // Robust parsing and error checking
     try {
-      reports[url] = JSON.parse(completion.choices[0].message.content);
+      reports[url + detail] = JSON.parse(completion.choices[0].message.content);
     } catch (jsonError) {
       console.error("Invalid JSON from OpenAI:", completion.choices[0].message.content);
-      reports[url] = { error: "Invalid response from AI model. Please retry." };
+      reports[url + detail] = { error: "Invalid response from AI model. Please retry." };
     }
 
   } catch (error) {
     console.error("OpenAI API error:", error);
-    reports[url] = { error: "Error generating report. Please retry." };
+    reports[url + detail] = { error: "Error generating report. Please retry." };
   }
 }
 
 app.get('/friendly', (req, res) => {
   const url = req.query.url;
+  const detail = req.query.detail || "summary";
   if (!url) return res.status(400).json({ error: "URL parameter is required." });
 
-  if (reports[url]) {
-    if (reports[url].error) {
-      res.status(500).json({ error: reports[url].error });
+  const reportKey = url + detail;
+  if (reports[reportKey]) {
+    if (reports[reportKey].error) {
+      res.status(500).json({ error: reports[reportKey].error });
     } else {
-      res.json(reports[url]);
+      res.json(reports[reportKey]);
     }
   } else {
-    generateReport(url);
+    generateReport(url, detail);
     res.status(202).json({ status: "processing" });
   }
 });
