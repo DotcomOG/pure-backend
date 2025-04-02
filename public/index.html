@@ -113,33 +113,41 @@
 </div>
 
 <!-- SCRIPT TO LOAD DYNAMIC DATA -->
+<!-- SCRIPT TO LOAD DYNAMIC DATA -->
 <script>
 document.addEventListener("DOMContentLoaded",function(){
   const url = new URLSearchParams(window.location.search).get("url")||"https://example.com";
   document.getElementById("inspected-url").textContent=url;
   document.getElementById("hidden-url").value=url;
 
+  // Display customized loading message
+  const loadingMessage = "Wait while SnipeRank is building your report...";
+  document.getElementById("score-percentage").textContent=loadingMessage;
+  document.getElementById("superpowers-list").innerHTML=`<li>${loadingMessage}</li>`;
+  document.getElementById("opportunities-list").innerHTML=`<li>${loadingMessage}</li>`;
+  document.getElementById("engine-insights-list").innerHTML=`<li>${loadingMessage}</li>`;
+
   fetch("/friendly?url="+encodeURIComponent(url))
-  .then(res=>res.json())
-  .then(data=>{
-    document.getElementById("score-percentage").textContent=data.score+"%";
-    document.getElementById("score-marker").style.left=data.score+"%";
+    .then(res=>res.json())
+    .then(data=>{
+      document.getElementById("score-percentage").textContent=data.score+"%";
+      document.getElementById("score-marker").style.left=data.score+"%";
 
-    const renderList=(id,items,emoji)=>{
-      const list=document.getElementById(id);
-      list.innerHTML="";
-      items.forEach(i=>{
-        const li=document.createElement("li");
-        li.innerHTML=`<div class="title">${emoji} ${i.title}</div><div class="explanation">${i.explanation}</div>`;
-        list.appendChild(li);
-      });
-    };
+      const renderList=(id,items,emoji)=>{
+        const list=document.getElementById(id);
+        list.innerHTML="";
+        items.forEach(i=>{
+          const li=document.createElement("li");
+          li.innerHTML=`<div class="title">${emoji} ${i.title}</div><div class="explanation">${i.explanation}</div>`;
+          list.appendChild(li);
+        });
+      };
 
-    renderList("superpowers-list",data.ai_superpowers.slice(0,5),"✅");
-    renderList("opportunities-list",data.ai_opportunities.slice(0,10),"🚨");
-    renderList("engine-insights-list",Object.entries(data.ai_engine_insights).map(([title,explanation])=>({title,explanation})),"🤖");
-  })
-  .catch(console.error);
+      renderList("superpowers-list",data.ai_superpowers,"✅");
+      renderList("opportunities-list",data.ai_opportunities,"🚨");
+      renderList("engine-insights-list",Object.entries(data.ai_engine_insights).map(([title,explanation])=>({title,explanation})),"🤖");
+    })
+    .catch(console.error);
 });
 </script>
 </body>
