@@ -6,7 +6,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Forum&family=Nunito+Sans:wght@300;400;700&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: 'Nunito Sans', sans-serif; background: #f9f9f9; margin: 0; padding: 0;
+      font-family: 'Nunito Sans', sans-serif; background: #f9f9f9; margin:0; padding:0;
     }
     header {
       text-align: center; padding: 15px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -19,25 +19,38 @@
       max-width: 700px; margin: 30px auto; background: #fff; padding: 20px 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
     h1, h2 { font-family: 'Forum', sans-serif; color: #333; }
+    .score-container {
+      display:flex; align-items:center; justify-content:center; margin-bottom:15px;
+    }
+    .score-label { font-weight:bold; margin-right:10px; }
+    .info-icon {
+      width: 14px; height: 14px; background-color: #007BFF; color:#fff;
+      border-radius:50%; text-align:center; line-height:14px; font-size:10px; cursor:pointer; margin-right:8px;
+    }
     .score-indicator {
-      width: 50%; height: 20px; background: linear-gradient(to right, red, yellow, green); border-radius: 10px; position: relative; margin: auto;
+      width:50%; height:20px; background:linear-gradient(to right, red,yellow,green); border-radius:10px; position:relative;
     }
     .score-marker {
-      width: 2px; background: black; height: 100%; position: absolute; top: 0;
+      width:2px; background:black; height:100%; position:absolute; top:0; animation:bounce 2s infinite;
     }
     @keyframes bounce {
-      0%, 100% { left: 0%; }
-      50% { left: 100%; }
+      0%,100%{left:0%;} 50%{left:100%;}
     }
-    .loading-animation {
-      animation: bounce 2s infinite;
+    ul { padding-left:0; }
+    ul li { margin:10px 0; list-style:none; }
+    .title { font-weight:bold; }
+    .explanation { font-size:0.9em; color:#666; }
+
+    /* Form Styles Corrected */
+    .form-container { width:75%; margin:auto; text-align:center; }
+    .form-row {
+      display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap; justify-content:center;
     }
-    ul { padding-left: 0; }
-    ul li { margin: 10px 0; list-style: none; }
-    .title { font-weight: bold; }
-    .explanation { font-size: 0.9em; color: #666; }
-    .form-container input { padding: 8px; width: 100%; margin-bottom: 10px; }
-    button { padding: 10px 20px; cursor: pointer; }
+    .form-row input {
+      padding:8px; flex:1; min-width:150px;
+    }
+    button { padding:10px 20px; cursor:pointer; }
+
   </style>
 </head>
 <body>
@@ -59,8 +72,12 @@
     <p id="waiting-message">Please wait while SnipeRank is building the report...</p>
   </div>
 
-  <div class="score-indicator">
-    <div id="score-marker" class="score-marker loading-animation"></div>
+  <div class="score-container">
+    <span class="info-icon" onclick="alert('AI SEO Score indicates overall optimization quality.');">?</span>
+    <div class="score-label">AI SEO Score:</div>
+    <div class="score-indicator">
+      <div id="score-marker" class="score-marker"></div>
+    </div>
   </div>
   <p id="score-percentage" style="text-align:center;">--%</p>
 
@@ -77,9 +94,13 @@
     <p>To receive your full, detailed AI SEO report, please provide your information below:</p>
     <form action="/detailed" method="POST">
       <input type="hidden" name="url" id="hidden-url" value="">
-      <input type="text" name="name" placeholder="Name*" required>
-      <input type="email" name="email" placeholder="Email*" required>
-      <input type="text" name="company" placeholder="Company/Organization">
+      <div class="form-row">
+        <input type="text" name="name" placeholder="Name*" required>
+        <input type="email" name="email" placeholder="Email*" required>
+      </div>
+      <div class="form-row">
+        <input type="text" name="company" placeholder="Company/Organization">
+      </div>
       <button type="submit">Get Full Report</button>
     </form>
   </div>
@@ -92,41 +113,29 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("hidden-url").value = url;
 
   const marker = document.getElementById("score-marker");
-
   const fetchReport = () => {
     fetch("/friendly?url=" + encodeURIComponent(url))
       .then(res => {
-        if (res.status === 202) {
-          setTimeout(fetchReport, 3000);
-          return null;
-        }
+        if (res.status === 202) { setTimeout(fetchReport, 3000); return null; }
         return res.json();
       })
       .then(data => {
         if (!data) return;
-
         document.getElementById("waiting-message").style.display = 'none';
-        marker.classList.remove("loading-animation");
+        marker.style.animation = 'none';
         marker.style.left = data.score + "%";
         document.getElementById("score-percentage").textContent = data.score + "%";
 
         const renderList = (id, items, emoji) => {
           const list = document.getElementById(id);
-          list.innerHTML = "";
-          items.forEach(i => {
-            const li = document.createElement("li");
-            li.innerHTML = `<div class="title">${emoji} ${i.title}</div><div class="explanation">${i.explanation}</div>`;
-            list.appendChild(li);
-          });
+          list.innerHTML = items.map(i => `<li><div class="title">${emoji} ${i.title}</div><div class="explanation">${i.explanation}</div></li>`).join('');
         };
-
         renderList("superpowers-list", data.ai_superpowers, "✅");
         renderList("opportunities-list", data.ai_opportunities, "🚨");
         renderList("engine-insights-list", Object.entries(data.ai_engine_insights).map(([title, explanation]) => ({ title, explanation })), "🤖");
       })
       .catch(console.error);
   };
-
   fetchReport();
 });
 </script>
