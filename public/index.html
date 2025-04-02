@@ -1,105 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>SnipeRank AI SEO Analysis</title>
+  <meta charset="UTF-8">
+  <title>SnipeRank SEO Summary Report</title>
   <link href="https://fonts.googleapis.com/css2?family=Forum&family=Nunito+Sans:wght@300;400;700&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Nunito Sans', sans-serif; background: #f9f9f9; margin:0; padding:0;
-    }
-    header {
-      text-align: center; padding: 15px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    header h2 { font-family: 'Forum', sans-serif; margin: 5px 0; }
-    nav a {
-      margin: 0 10px; text-decoration: none; font-weight: 600; color: #000;
-    }
-    .container {
-      max-width: 700px; margin: 30px auto; background: #fff; padding: 20px 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    h1, h2 { font-family: 'Forum', sans-serif; color: #333; }
-    .score-container {
-      display:flex; align-items:center; justify-content:center; margin-bottom:15px;
-    }
-    .score-label { font-weight:bold; margin-right:10px; }
-    .info-icon {
-      width: 14px; height: 14px; background-color: #007BFF; color:#fff;
-      border-radius:50%; text-align:center; line-height:14px; font-size:10px; cursor:pointer; margin-right:8px;
-    }
-    .score-indicator {
-      width:50%; height:20px; background:linear-gradient(to right, red,yellow,green); border-radius:10px; position:relative;
-    }
-    .score-marker {
-      width:2px; background:black; height:100%; position:absolute; top:0; animation:bounce 2s infinite;
-    }
-    @keyframes bounce {
-      0%,100%{left:0%;} 50%{left:100%;}
-    }
-    ul { padding-left:0; }
-    ul li { margin:10px 0; list-style:none; }
-    .title { font-weight:bold; }
-    .explanation { font-size:0.9em; color:#666; }
-
-    /* Form Styles Corrected */
+    body { font-family: 'Nunito Sans', sans-serif; background: #f9f9f9; margin: 0; padding: 0; }
+    header { text-align: center; padding: 15px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .container { max-width: 700px; margin: 30px auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    h1, h2 { font-family: 'Forum', serif; color: #333; text-align:center; }
+    .score-container { display:flex; align-items:center; justify-content:center; margin-bottom:15px; }
+    .score-indicator { width:50%; height:20px; background:linear-gradient(to right, red,yellow,green); position:relative; border-radius:10px; }
+    .score-marker { width:2px; height:100%; position:absolute; animation:bounce 2s infinite; background:#000; }
+    @keyframes bounce { 0%,100%{left:0%;}50%{left:100%;} }
+    ul { padding:0; } li { margin-bottom:10px; list-style:none; }
+    .title { font-weight:bold; } .explanation { font-size:0.9em; color:#555; }
     .form-container { width:75%; margin:auto; text-align:center; }
-    .form-row {
-      display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap; justify-content:center;
-    }
-    .form-row input {
-      padding:8px; flex:1; min-width:150px;
-    }
-    button { padding:10px 20px; cursor:pointer; }
-
+    .form-row { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:10px; }
+    input { padding:8px; flex:1; min-width:150px; } button { padding:10px 20px; cursor:pointer; }
   </style>
 </head>
 <body>
-<header>
-  <h2>Yoram Ezra Strategies</h2>
-  <nav>
-    <a href="#">Home</a>
-
-  </nav>
-</header>
-
+<header><h2>Yoram Ezra Strategies</h2></header>
 <div class="container">
-  <h1 style="text-align:center;">
-    SnipeRank Short AI SEO Analysis<br>
-    <small style="font-size:0.7em;">🤖 Powered by ChatGPT 🤖</small>
-  </h1>
-  <div class="header-info" style="text-align:center;">
-    <p>URL inspected: <strong id="inspected-url">Loading URL...</strong></p>
-    <p id="waiting-message">Please wait while SnipeRank is building the report.<br>It may take a minute, we're gathering and analysing the full site</p>
-  </div>
-
+  <h1>SEO Summary Report</h1>
+  <p>URL inspected: <strong id="inspected-url">ChatGPT is Working...</strong></p>
+  <p id="waiting-message">PPlease wait while SnipeRank is building the full report.<br>It may take a minute, we're gathering and analyzing the full site</p>
   <div class="score-container">
-    <span class="info-icon" onclick="alert('AI SEO Score indicates overall optimization quality.');">?</span>
-    <div class="score-label">AI SEO Score:</div>
-    <div class="score-indicator">
-      <div id="score-marker" class="score-marker"></div>
-    </div>
+    <div class="score-indicator"><div id="score-marker" class="score-marker"></div></div>
   </div>
-  <p id="score-percentage" style="text-align:center;">--%</p>
-
-  <h2>Your Site's Superpowers</h2>
-  <ul id="superpowers-list"><li>ChatGPT is Working...</li></ul>
-
-  <h2>Opportunities for an AI Boost</h2>
-  <ul id="opportunities-list"><li>ChatGPT is Working...</li></ul>
-
-  <h2>AI Engine Insights</h2>
-  <ul id="engine-insights-list"><li>ChatGPT is Working...</li></ul>
-
+  <h2>Superpowers</h2><ul id="superpowers-list"><li>ChatGPT is Working...</li></ul>
+  <h2>Opportunities</h2><ul id="opportunities-list"><li>ChatGPT is Working...</li></ul>
+  <h2>AI Insights</h2><ul id="engine-insights-list"><li>ChatGPT is Working...</li></ul>
+  
   <div class="form-container">
-    <p>To receive your full, detailed AI SEO report, please provide your information below:</p>
-    <form action="/detailed" method="POST">
-      <input type="hidden" name="url" id="hidden-url" value="">
+    <form id="summaryForm">
+      <input type="hidden" id="hidden-url" value="">
       <div class="form-row">
-        <input type="text" name="name" placeholder="Name*" required>
-        <input type="email" name="email" placeholder="Email*" required>
+        <input type="text" name="name" placeholder="Your Name*" required>
+        <input type="email" name="email" placeholder="Your Email*" required>
       </div>
       <div class="form-row">
-        <input type="text" name="company" placeholder="Company/Organization">
+        <input type="text" name="company" placeholder="Company (optional)">
       </div>
       <button type="submit">Get Full Report</button>
     </form>
@@ -107,36 +49,36 @@
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
   const url = new URLSearchParams(window.location.search).get("url") || "https://example.com";
   document.getElementById("inspected-url").textContent = url;
   document.getElementById("hidden-url").value = url;
 
-  const marker = document.getElementById("score-marker");
   const fetchReport = () => {
-    fetch("/friendly?url=" + encodeURIComponent(url))
-      .then(res => {
-        if (res.status === 202) { setTimeout(fetchReport, 3000); return null; }
-        return res.json();
-      })
+    fetch(`/friendly?url=${encodeURIComponent(url)}`)
+      .then(res => res.status === 202 ? setTimeout(fetchReport,3000) : res.json())
       .then(data => {
         if (!data) return;
-        document.getElementById("waiting-message").style.display = 'none';
-        marker.style.animation = 'none';
-        marker.style.left = data.score + "%";
-        document.getElementById("score-percentage").textContent = data.score + "%";
-
-        const renderList = (id, items, emoji) => {
-          const list = document.getElementById(id);
-          list.innerHTML = items.map(i => `<li><div class="title">${emoji} ${i.title}</div><div class="explanation">${i.explanation}</div></li>`).join('');
+        document.getElementById("waiting-message").style.display='none';
+        document.getElementById("score-marker").style.animation='none';
+        document.getElementById("score-marker").style.left=data.score+'%';
+        const render=(id,items,emoji)=>{
+          document.getElementById(id).innerHTML=items.map(i=>`<li><div class="title">${emoji} ${i.title}</div><div class="explanation">${i.explanation}</div></li>`).join('');
         };
-        renderList("superpowers-list", data.ai_superpowers, "✅");
-        renderList("opportunities-list", data.ai_opportunities, "🚨");
-        renderList("engine-insights-list", Object.entries(data.ai_engine_insights).map(([title, explanation]) => ({ title, explanation })), "🤖");
-      })
-      .catch(console.error);
+        render("superpowers-list",data.ai_superpowers,"✅");
+        render("opportunities-list",data.ai_opportunities,"🚨");
+        render("engine-insights-list",Object.entries(data.ai_engine_insights).map(([t,e])=>({title:t,explanation:e})),"🤖");
+      });
   };
   fetchReport();
+
+  document.getElementById('summaryForm').addEventListener('submit',e=>{
+    e.preventDefault();
+    localStorage.setItem("userName",e.target.name.value);
+    localStorage.setItem("userEmail",e.target.email.value);
+    localStorage.setItem("userCompany",e.target.company.value);
+    window.location=`/full-report.html?url=${encodeURIComponent(url)}`;
+  });
 });
 </script>
 </body>
