@@ -11,13 +11,56 @@
     .container { max-width: 700px; margin: 30px auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
     h1, h2 { font-family: 'Forum', serif; color: #333; text-align:center; }
 
-    /* --- Score Bar Styles --- */
-    .score-container { display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:15px; }
-    .info-icon { cursor:pointer; font-weight:bold; background:#007BFF; color:#fff; padding:3px 8px; border-radius:50%; font-size:12px; }
-    .score-indicator { width:50%; height:20px; background:linear-gradient(to right, red,yellow,green); position:relative; border-radius:10px; }
-    .score-marker { width:2px; height:100%; position:absolute; animation:bounce 2s infinite; background:#000; }
-    .score-percentage { position:absolute; width:100%; text-align:center; line-height:20px; font-size:0.9em; color:#000; }
-    @keyframes bounce { 0%,100%{left:0%;}50%{left:100%;} }
+    /* --- Score Bar Styles (Corrected & Animated) --- */
+.score-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.info-icon {
+  cursor: pointer;
+  font-weight: bold;
+  background: #007BFF;
+  color: #fff;
+  padding: 3px 8px;
+  border-radius: 50%;
+  font-size: 12px;
+}
+
+.score-indicator {
+  width: 50%;
+  height: 20px;
+  background: linear-gradient(to right, red, yellow, green);
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.score-marker {
+  width: 2px;
+  height: 100%;
+  position: absolute;
+  background: #000;
+  animation: bounce 2s infinite ease-in-out;
+}
+
+.score-percentage {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  line-height: 20px;
+  font-size: 0.9em;
+  color: #000;
+  pointer-events: none;
+}
+
+@keyframes bounce {
+  0%, 100% { left: 0%; }
+  50% { left: 100%; }
+}
 
     /* --- Lists and Text Styles --- */
     ul { padding:0; } 
