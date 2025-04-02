@@ -1,71 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Detailed AI SEO Report</title>
+  <meta charset="UTF-8" />
+  <title>SnipeRank Detailed SEO Report</title>
   <link href="https://fonts.googleapis.com/css2?family=Forum&family=Nunito+Sans:wght@300;400;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Nunito Sans', sans-serif; background:#f9f9f9; margin:0; padding:20px; }
-    .container { max-width:800px; margin:auto; background:#fff; padding:30px; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
-    h1,h2 { font-family:'Forum',serif; }
-    ul { list-style:none; padding:0; }
-    li { margin-bottom:15px; }
+    body {
+      font-family: 'Nunito Sans', sans-serif; background: #f9f9f9; margin: 0; padding: 0;
+    }
+    header {
+      text-align: center; padding: 15px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    header h2 { font-family: 'Forum', sans-serif; margin: 5px 0; }
+    nav a {
+      margin: 0 10px; text-decoration: none; font-weight: 600; color: #000;
+    }
+    .container {
+      max-width: 700px; margin: 30px auto; background: #fff; padding: 20px 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    h1, h2 { font-family: 'Forum', sans-serif; color: #333; }
+    ul { padding-left:0; }
+    li { margin-bottom:10px; }
     .title { font-weight:bold; }
-    .explanation { color:#555; margin-left:15px; }
+    .explanation { font-size:0.9em; color:#666; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Detailed AI SEO Analysis for <span id="detailed-url">Loading...</span></h1>
-    <p><strong>Name:</strong> <span id="report-name"></span> | <strong>Email:</strong> <span id="report-email"></span> | <strong>Company:</strong> <span id="report-company"></span></p>
+<header>
+  <h2>Yoram Ezra Strategies</h2>
+  <nav>
+    <a href="/">Home</a>
+    <a href="#">AI SEO Analyzer</a>
+  </nav>
+</header>
 
-    <h2>🔍 AI Superpowers (What you're doing well)</h2>
-    <ul id="detailed-superpowers"></ul>
+<div class="container">
+  <h1 style="text-align:center;">
+    Detailed AI SEO Report<br>
+    <small style="font-size:0.7em;">🤖 Powered by ChatGPT 🤖</small>
+  </h1>
+  <p style="text-align:center;">URL inspected: <strong id="inspected-url">Loading...</strong></p>
 
-    <h2>⚠️ AI Opportunities (Areas for improvement)</h2>
-    <ul id="detailed-opportunities"></ul>
+  <h2>Site Superpowers (SEO Strengths)</h2>
+  <ul id="superpowers-list"><li>Loading...</li></ul>
 
-    <h2>🤖 AI Engine Insights</h2>
-    <ul id="detailed-engine-insights"></ul>
-  </div>
+  <h2>SEO Opportunities (Improvements Needed)</h2>
+  <ul id="opportunities-list"><li>Loading...</li></ul>
+
+  <h2>Detailed AI Engine Insights</h2>
+  <ul id="engine-insights-list"><li>Loading...</li></ul>
+</div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-  // Fetch details saved from summary page form
-  const url = localStorage.getItem('reportURL') || 'https://example.com';
-  const name = localStorage.getItem('reportName');
-  const email = localStorage.getItem('reportEmail');
-  const company = localStorage.getItem('reportCompany') || 'N/A';
+document.addEventListener("DOMContentLoaded", function () {
+  const params = new URLSearchParams(window.location.search);
+  const url = params.get("url") || "https://example.com";
+  document.getElementById("inspected-url").textContent = url;
 
-  document.getElementById('detailed-url').textContent = url;
-  document.getElementById('report-name').textContent = name;
-  document.getElementById('report-email').textContent = email;
-  document.getElementById('report-company').textContent = company;
+  const fetchReport = () => {
+    fetch(`/friendly?url=${encodeURIComponent(url)}&detail=full`)
+      .then(res => {
+        if (res.status === 202) { 
+          setTimeout(fetchReport, 3000); 
+          return null; 
+        }
+        return res.json();
+      })
+      .then(data => {
+        if (!data) return;
 
-  // Fetch the detailed report data from backend
-  fetch(`/detailed-report?url=${encodeURIComponent(url)}`)
-    .then(res => res.json())
-    .then(data => {
-      const renderList = (id, items, emoji) => {
-        const list = document.getElementById(id);
-        items.forEach(item => {
-          const li = document.createElement('li');
-          li.innerHTML = `<div class="title">${emoji} ${item.title}</div><div class="explanation">${item.explanation}</div>`;
-          list.appendChild(li);
-        });
-      };
+        const renderList = (id, items, emoji) => {
+          const list = document.getElementById(id);
+          list.innerHTML = items.map(i => `
+            <li>
+              <div class="title">${emoji} ${i.title}</div>
+              <div class="explanation">${i.explanation}</div>
+            </li>
+          `).join('');
+        };
 
-      renderList('detailed-superpowers', data.ai_superpowers, '✅');
-      renderList('detailed-opportunities', data.ai_opportunities, '🚨');
+        renderList("superpowers-list", data.ai_superpowers, "✅");
+        renderList("opportunities-list", data.ai_opportunities, "🚨");
+        renderList("engine-insights-list", Object.entries(data.ai_engine_insights).map(([title, explanation]) => ({ title, explanation })), "🤖");
+      })
+      .catch(console.error);
+  };
 
-      const insightsList = document.getElementById('detailed-engine-insights');
-      Object.entries(data.ai_engine_insights).forEach(([engine, insight]) => {
-        const li = document.createElement('li');
-        li.innerHTML = `<div class="title">🤖 ${engine}</div><div class="explanation">${insight}</div>`;
-        insightsList.appendChild(li);
-      });
-    })
-    .catch(console.error);
+  fetchReport();
 });
 </script>
 </body>
