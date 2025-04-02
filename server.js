@@ -13,25 +13,26 @@ const reports = {};
 async function generateReport(url, detail = "summary") {
   try {
     const promptDetail = detail === "full" 
-      ? `Provide an extensive, detailed, sales-oriented SEO audit designed to clearly demonstrate deep expertise and encourage consulting engagements. 
-         Explicitly include:
-         - SEO score (0-100)
-         - Exactly 8-10 detailed SEO strengths ("ai_superpowers")
-         - Exactly 20-30 detailed SEO weaknesses ("ai_opportunities")
-         - Clearly written, highly detailed, actionable insights (5-7 sentences each) from ChatGPT, Claude, Gemini, Copilot, and Jasper AI`
-      : `Provide a concise SEO audit summary clearly indicating key strengths and areas for improvement.
-         Explicitly include:
-         - SEO score (0-100)
-         - Exactly 5 detailed SEO strengths ("ai_superpowers")
-         - Exactly 10 detailed SEO weaknesses ("ai_opportunities")
-         - Clear, brief insights (2-4 sentences each) from ChatGPT, Claude, Gemini, Copilot, and Jasper AI`;
+      ? `Provide an extensive, detailed, sales-oriented audit specifically for optimizing AI SEO, NOT traditional Google SEO. Clearly focus only on factors affecting visibility in AI-powered search engines (e.g., ChatGPT, Bing Chat, Gemini, Claude, Jasper AI).
+      Explicitly include:
+      - AI SEO score (0-100)
+      - Exactly 8-10 detailed AI SEO strengths ("ai_superpowers")
+      - Exactly 20-30 detailed AI SEO weaknesses ("ai_opportunities")
+      - Clearly written, actionable insights (5-7 sentences each) specifically on how the URL currently performs and could improve visibility and engagement in AI-driven search and chat engines (ChatGPT, Claude, Gemini, Copilot, Jasper).`
+      : `Provide a concise AI SEO-focused audit summary (NOT Google SEO) clearly indicating key strengths and areas for improvement specifically for AI-powered search engines (ChatGPT, Claude, Gemini, Copilot, Jasper).
+      Explicitly include:
+      - AI SEO score (0-100)
+      - Exactly 5 detailed AI SEO strengths ("ai_superpowers")
+      - Exactly 10 detailed AI SEO weaknesses ("ai_opportunities")
+      - Clear insights (2-4 sentences each) on visibility in AI-driven search engines.`;
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-4-turbo',
       messages: [{
         role: 'system',
         content: `
-        Carefully analyze the provided URL for SEO:
+        Carefully analyze the provided URL specifically for AI SEO optimization (visibility in AI-powered search engines like ChatGPT, Bing Chat, Claude, Gemini, Copilot, Jasper). 
+        DO NOT include traditional Google SEO tips or insights.
         ${promptDetail}
         Respond ONLY in valid JSON exactly matching:
         {
@@ -49,7 +50,7 @@ async function generateReport(url, detail = "summary") {
         }`
       },{
         role: 'user',
-        content: `Analyze this site: ${url}`
+        content: `Analyze this site specifically for AI SEO: ${url}`
       }],
       temperature: 0.5,
       max_tokens: detail === "full" ? 2500 : 1200,
