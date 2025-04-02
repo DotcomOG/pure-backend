@@ -13,23 +13,25 @@ const reports = {};
 async function generateReport(url, detail = "summary") {
   try {
     const promptDetail = detail === "full" 
-      ? `Provide a highly detailed, sales-oriented SEO audit with:
-        - SEO score (0-100)
-        - 5-10 detailed SEO strengths ("ai_superpowers")
-        - 10-30 detailed SEO weaknesses ("ai_opportunities")
-        - In-depth, actionable insights (5-7 sentences each) from ChatGPT, Claude, Gemini, Copilot, Jasper`
-      : `Provide a brief SEO audit summary with:
-        - SEO score (0-100)
-        - 3-5 brief SEO strengths ("ai_superpowers")
-        - 3-10 brief SEO weaknesses ("ai_opportunities")
-        - Brief insights (2-5 sentences each) from ChatGPT, Claude, Gemini, Copilot, Jasper`;
+      ? `Provide an extensive, detailed, sales-oriented SEO audit designed to clearly demonstrate deep expertise and encourage consulting engagements. 
+         Explicitly include:
+         - SEO score (0-100)
+         - Exactly 8-10 detailed SEO strengths ("ai_superpowers")
+         - Exactly 20-30 detailed SEO weaknesses ("ai_opportunities")
+         - Clearly written, highly detailed, actionable insights (5-7 sentences each) from ChatGPT, Claude, Gemini, Copilot, and Jasper AI`
+      : `Provide a concise SEO audit summary clearly indicating key strengths and areas for improvement.
+         Explicitly include:
+         - SEO score (0-100)
+         - Exactly 5 detailed SEO strengths ("ai_superpowers")
+         - Exactly 10 detailed SEO weaknesses ("ai_opportunities")
+         - Clear, brief insights (2-4 sentences each) from ChatGPT, Claude, Gemini, Copilot, and Jasper AI`;
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-4-turbo',
       messages: [{
         role: 'system',
         content: `
-        Analyze the provided URL for SEO carefully:
+        Carefully analyze the provided URL for SEO:
         ${promptDetail}
         Respond ONLY in valid JSON exactly matching:
         {
@@ -37,14 +39,20 @@ async function generateReport(url, detail = "summary") {
           "score": numeric-value,
           "ai_superpowers": [{title:"", explanation:""}],
           "ai_opportunities": [{title:"", explanation:""}],
-          "ai_engine_insights": {"ChatGPT":"", "Claude":"", "Gemini":"", "Copilot":"", "Jasper":""}
+          "ai_engine_insights": {
+            "ChatGPT": "...",
+            "Claude": "...",
+            "Gemini": "...",
+            "Copilot": "...",
+            "Jasper": "..."
+          }
         }`
       },{
         role: 'user',
         content: `Analyze this site: ${url}`
       }],
       temperature: 0.5,
-      max_tokens: detail === "full" ? 2000 : 1000,
+      max_tokens: detail === "full" ? 2500 : 1200,
       response_format: { type: "json_object" }
     });
 
