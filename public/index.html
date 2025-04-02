@@ -2,25 +2,51 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>AI SEO Analysis (Powered by ChatGPT)</title>
+  <title>AI SEO Analysis Summary (Powered by ChatGPT)</title>
   <link href="https://fonts.googleapis.com/css2?family=Forum&family=Nunito+Sans:wght@300;400;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Nunito Sans', sans-serif; background: #f9f9f9; margin:0; padding:0; }
-    header { text-align:center; padding:20px; background:#fff; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
-    nav a { margin:0 10px; text-decoration:none; font-weight:600; color:#000; }
-    .container { max-width:700px; margin:20px auto; padding:20px; background:#fff; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
-    h1,h2 { font-family:'Forum', serif; }
-    ul { padding:0; list-style:none; }
-    li { margin-bottom:10px; }
-    .score { position:relative; height:20px; background:linear-gradient(to right,red,yellow,green); border-radius:10px; }
-    .marker { position:absolute; top:0; width:2px; height:100%; background:#000; }
-    .percentage { position:absolute; top:0; width:100%; text-align:center; }
-    .form-row { display:flex; gap:10px; margin-bottom:10px; }
-    input, button { padding:8px; width:100%; box-sizing:border-box; }
-    @media (max-width:600px){ .form-row { flex-direction:column; }}
+    /* Global Styles */
+    body { font-family: 'Nunito Sans', sans-serif; background: #f9f9f9; margin: 0; padding: 0; }
+
+    /* HEADER SECTION */
+    header { text-align: center; padding: 15px 20px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    header h2 { font-family: 'Forum', serif; margin: 5px 0; }
+    nav a { margin: 0 10px; text-decoration: none; font-weight: 600; color: #000; }
+
+    /* MAIN CONTAINER */
+    .container { max-width: 700px; margin: 20px auto; padding: 20px 30px; background: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    h1,h2 { font-family: 'Forum', serif; color: #333; }
+
+    /* AI SEO SCORE SECTION */
+    .score-container { display: flex; align-items: center; gap: 10px; margin: 20px 0; }
+    .info-icon { width: 14px; height: 14px; background: #007BFF; color: #fff; border-radius: 50%; text-align: center; cursor: pointer; }
+    .score-indicator-container { width: 50%; position: relative; }
+    .score-indicator { height: 20px; background: linear-gradient(to right, red,yellow,green); border-radius: 10px; }
+    .score-marker { position: absolute; width: 2px; background: black; height: 100%; }
+    .score-percentage { position: absolute; width: 100%; text-align: center; line-height: 20px; }
+
+    /* LIST STYLES */
+    ul { padding: 0; list-style: none; }
+    li { margin-bottom: 10px; }
+    li .title { font-weight: bold; }
+    li .explanation { margin-left: 15px; color: #555; font-size: 0.9em; }
+
+    /* FORM SECTION */
+    .form-container { width: 75%; margin: auto; margin-top: 20px; }
+    .form-row { display: flex; gap: 10px; margin-bottom: 10px; }
+    .form-row input, button { padding: 8px; width: 100%; box-sizing: border-box; }
+    button { cursor: pointer; }
+    @media (max-width:600px){ .form-row { flex-direction: column; } }
+
+    /* LIGHTBOX */
+    #lightbox { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); }
+    #lightbox-content { background:#fff; padding:20px; margin:100px auto; width:80%; max-width:500px; border-radius:8px; position:relative; }
+    #lightbox-close { position:absolute; top:10px; left:10px; cursor:pointer; }
   </style>
 </head>
 <body>
+
+<!-- HEADER SECTION -->
 <header>
   <h2>Yoram Ezra Strategies</h2>
   <nav>
@@ -29,71 +55,91 @@
   </nav>
 </header>
 
+<!-- MAIN CONTENT CONTAINER -->
 <div class="container">
-  <h1>AI SEO Analysis Summary<br><small>🤖 Powered by ChatGPT 🤖</small></h1>
-  <p>URL inspected: <strong id="inspected-url">Loading...</strong></p>
+  <center>
+    <h1>Short AI SEO Analysis<br><small>🤖 Powered by ChatGPT 🤖</small></h1>
+    <p>URL inspected: <strong id="inspected-url">Loading...</strong></p>
+  </center>
 
-  <div class="score">
-    <div class="marker" id="score-marker" style="left:0;"></div>
-    <div class="percentage" id="score-percentage">Loading...</div>
+  <!-- SCORE SECTION WITH LIGHTBOX -->
+  <div class="score-container">
+    <span class="info-icon" onclick="document.getElementById('lightbox').style.display='block';">?</span>
+    <div><strong>AI SEO Score:</strong></div>
+    <div class="score-indicator-container">
+      <div class="score-indicator">
+        <div class="score-marker" id="score-marker" style="left:0;"></div>
+        <span class="score-percentage" id="score-percentage">Loading...</span>
+      </div>
+    </div>
   </div>
 
-  <h2>Superpowers (SEO Strengths)</h2>
+  <!-- Superpowers SECTION -->
+  <h2>Superpowers</h2>
   <ul id="superpowers-list"><li>Loading...</li></ul>
 
+  <!-- Opportunities SECTION -->
   <h2>Opportunities for Improvement</h2>
   <ul id="opportunities-list"><li>Loading...</li></ul>
 
+  <!-- AI Engine Insights SECTION -->
   <h2>AI Engine Insights</h2>
   <ul id="engine-insights-list"><li>Loading...</li></ul>
 
-  <form action="/detailed" method="POST">
-    <input type="hidden" name="url" id="hidden-url">
-    <div class="form-row">
-      <input type="text" name="name" placeholder="Name*" required>
-      <input type="email" name="email" placeholder="Email*" required>
-    </div>
-    <div class="form-row">
-      <input type="text" name="company" placeholder="Company/Organization">
-    </div>
-    <button type="submit">Get Full Report</button>
-  </form>
+  <!-- FORM SECTION -->
+  <div class="form-container">
+    <p>To receive your full detailed AI SEO report, please provide your details:</p>
+    <form action="/detailed" method="POST">
+      <input type="hidden" name="url" id="hidden-url">
+      <div class="form-row">
+        <input type="text" name="name" placeholder="Name*" required>
+        <input type="email" name="email" placeholder="Email*" required>
+      </div>
+      <div class="form-row">
+        <input type="text" name="company" placeholder="Company/Organization">
+      </div>
+      <button type="submit">Get Full Report</button>
+    </form>
+  </div>
 </div>
 
+<!-- LIGHTBOX CONTENT -->
+<div id="lightbox">
+  <div id="lightbox-content">
+    <span id="lightbox-close" onclick="document.getElementById('lightbox').style.display='none';">Close [X]</span>
+    <h2>AI SEO Score Explained</h2>
+    <p>Score explanation content goes here...</p>
+  </div>
+</div>
+
+<!-- SCRIPT TO LOAD DYNAMIC DATA -->
 <script>
-document.addEventListener("DOMContentLoaded", function(){
-  const inspectedUrl = new URLSearchParams(window.location.search).get("url") || "https://example.com";
-  document.getElementById("inspected-url").textContent = inspectedUrl;
-  document.getElementById("hidden-url").value = inspectedUrl;
+document.addEventListener("DOMContentLoaded",function(){
+  const url = new URLSearchParams(window.location.search).get("url")||"https://example.com";
+  document.getElementById("inspected-url").textContent=url;
+  document.getElementById("hidden-url").value=url;
 
-  fetch("/friendly?url=" + encodeURIComponent(inspectedUrl))
-    .then(res => res.json())
-    .then(data => {
-      document.getElementById("score-percentage").textContent = data.score + "%";
-      document.getElementById("score-marker").style.left = data.score + "%";
+  fetch("/friendly?url="+encodeURIComponent(url))
+  .then(res=>res.json())
+  .then(data=>{
+    document.getElementById("score-percentage").textContent=data.score+"%";
+    document.getElementById("score-marker").style.left=data.score+"%";
 
-      const populateList = (id, items, emoji, maxItems) => {
-        const list = document.getElementById(id);
-        list.innerHTML = "";
-        items.slice(0, maxItems).forEach(i => {
-          const li = document.createElement("li");
-          li.innerHTML = `${emoji} <strong>${i.title}:</strong> ${i.explanation}`;
-          list.appendChild(li);
-        });
-      };
-
-      populateList("superpowers-list", data.ai_superpowers, "✅", 5);
-      populateList("opportunities-list", data.ai_opportunities, "🚨", 10);
-
-      const insightsList = document.getElementById("engine-insights-list");
-      insightsList.innerHTML = "";
-      Object.entries(data.ai_engine_insights).forEach(([engine, insight])=>{
-        const li = document.createElement("li");
-        li.innerHTML = `🤖 <strong>${engine}:</strong> ${insight}`;
-        insightsList.appendChild(li);
+    const renderList=(id,items,emoji)=>{
+      const list=document.getElementById(id);
+      list.innerHTML="";
+      items.forEach(i=>{
+        const li=document.createElement("li");
+        li.innerHTML=`<div class="title">${emoji} ${i.title}</div><div class="explanation">${i.explanation}</div>`;
+        list.appendChild(li);
       });
-    })
-    .catch(err=>console.error("Error:",err));
+    };
+
+    renderList("superpowers-list",data.ai_superpowers.slice(0,5),"✅");
+    renderList("opportunities-list",data.ai_opportunities.slice(0,10),"🚨");
+    renderList("engine-insights-list",Object.entries(data.ai_engine_insights).map(([title,explanation])=>({title,explanation})),"🤖");
+  })
+  .catch(console.error);
 });
 </script>
 </body>
