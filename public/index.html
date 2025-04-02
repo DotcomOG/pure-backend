@@ -5,34 +5,85 @@
   <title>SnipeRank SEO Summary Report</title>
   <link href="https://fonts.googleapis.com/css2?family=Forum&family=Nunito+Sans:wght@300;400;700&display=swap" rel="stylesheet">
   <style>
+    /* --- Global Styles --- */
     body { font-family: 'Nunito Sans', sans-serif; background: #f9f9f9; margin: 0; padding: 0; }
     header { text-align: center; padding: 15px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
     .container { max-width: 700px; margin: 30px auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
     h1, h2 { font-family: 'Forum', serif; color: #333; text-align:center; }
-    .score-container { display:flex; align-items:center; justify-content:center; margin-bottom:15px; }
+
+    /* --- Score Bar Styles --- */
+    .score-container { display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:15px; }
+    .info-icon { cursor:pointer; font-weight:bold; background:#007BFF; color:#fff; padding:3px 8px; border-radius:50%; font-size:12px; }
     .score-indicator { width:50%; height:20px; background:linear-gradient(to right, red,yellow,green); position:relative; border-radius:10px; }
     .score-marker { width:2px; height:100%; position:absolute; animation:bounce 2s infinite; background:#000; }
+    .score-percentage { position:absolute; width:100%; text-align:center; line-height:20px; font-size:0.9em; color:#000; }
     @keyframes bounce { 0%,100%{left:0%;}50%{left:100%;} }
-    ul { padding:0; } li { margin-bottom:10px; list-style:none; }
-    .title { font-weight:bold; } .explanation { font-size:0.9em; color:#555; }
+
+    /* --- Lists and Text Styles --- */
+    ul { padding:0; } 
+    li { margin-bottom:10px; list-style:none; }
+    .title { font-weight:bold; } 
+    .explanation { font-size:0.9em; color:#555; }
+
+    /* --- Form Styles --- */
     .form-container { width:75%; margin:auto; text-align:center; }
     .form-row { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:10px; }
-    input { padding:8px; flex:1; min-width:150px; } button { padding:10px 20px; cursor:pointer; }
+    input { padding:8px; flex:1; min-width:150px; } 
+    button { padding:10px 20px; cursor:pointer; }
+
+    /* --- Lightbox Styles --- */
+    #lightbox { 
+      display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
+      background:rgba(0,0,0,0.6); z-index:1000; 
+    }
+    #lightbox-content {
+      background:#fff; max-width:400px; margin:100px auto; padding:20px; border-radius:8px; position:relative;
+    }
+    #lightbox-close {
+      position:absolute; top:10px; right:10px; cursor:pointer; font-weight:bold;
+    }
   </style>
 </head>
 <body>
+
+<!-- HEADER -->
 <header><h2>Yoram Ezra Strategies</h2></header>
+
 <div class="container">
-  <h1>SEO Summary Report</h1>
-  <p>URL inspected: <strong id="inspected-url">ChatGPT is Working...</strong></p>
-  <p id="waiting-message">PPlease wait while SnipeRank is building the full report.<br>It may take a minute, we're gathering and analyzing the full site</p>
-  <div class="score-container">
-    <div class="score-indicator"><div id="score-marker" class="score-marker"></div></div>
-  </div>
-  <h2>Superpowers</h2><ul id="superpowers-list"><li>ChatGPT is Working...</li></ul>
-  <h2>Opportunities</h2><ul id="opportunities-list"><li>ChatGPT is Working...</li></ul>
-  <h2>AI Insights</h2><ul id="engine-insights-list"><li>ChatGPT is Working...</li></ul>
   
+  <!-- MAIN TITLE -->
+  <h1>SnipeRank Summery AI SEO Analysis</h1>
+
+  <!-- INSPECTED URL AND WAITING MESSAGE -->
+  <p>URL inspected: <strong id="inspected-url">ChatGPT is Working...</strong></p>
+  <p id="waiting-message">
+    Please wait while SnipeRank is building the report.<br>
+    It may take a minute, we're gathering and analyzing the website
+  </p>
+
+  <!-- AI SEO SCORE SECTION (animated bar, clickable info icon, and percentage) -->
+  <div class="score-container">
+    <span class="info-icon" onclick="document.getElementById('lightbox').style.display='block';">?</span>
+    <div>(?) AI SEO Score:</div>
+    <div class="score-indicator">
+      <div id="score-marker" class="score-marker"></div>
+      <span class="score-percentage" id="score-percentage">Loading...</span>
+    </div>
+  </div>
+
+  <!-- SUPERPOWERS SECTION -->
+  <h2>Superpowers</h2>
+  <ul id="superpowers-list"><li>ChatGPT is Working...</li></ul>
+
+  <!-- OPPORTUNITIES SECTION -->
+  <h2>Opportunities</h2>
+  <ul id="opportunities-list"><li>ChatGPT is Working...</li></ul>
+
+  <!-- AI ENGINE INSIGHTS SECTION -->
+  <h2>AI Insights</h2>
+  <ul id="engine-insights-list"><li>ChatGPT is Working...</li></ul>
+  
+  <!-- USER DETAILS FORM -->
   <div class="form-container">
     <form id="summaryForm">
       <input type="hidden" id="hidden-url" value="">
@@ -48,12 +99,30 @@
   </div>
 </div>
 
+<!-- LIGHTBOX FOR AI SEO SCORE EXPLANATION -->
+<div id="lightbox">
+  <div id="lightbox-content">
+    <span id="lightbox-close" onclick="document.getElementById('lightbox').style.display='none';">X</span>
+    <h2>AI SEO Score Explained</h2>
+    <p>This score evaluates key SEO factors specifically influencing your site's visibility in AI-driven search engines. Higher scores indicate better AI-specific SEO performance.</p>
+    <ul style="text-align:left;">
+      <li><strong>0-20:</strong> Critical AI SEO issues.</li>
+      <li><strong>21-40:</strong> Severe AI SEO issues.</li>
+      <li><strong>41-60:</strong> Moderate AI SEO issues.</li>
+      <li><strong>61-80:</strong> Minor AI SEO issues.</li>
+      <li><strong>81-100:</strong> Excellent AI SEO health.</li>
+    </ul>
+  </div>
+</div>
+
 <script>
+/* --- PAGE LOAD & DATA FETCH --- */
 document.addEventListener("DOMContentLoaded", () => {
   const url = new URLSearchParams(window.location.search).get("url") || "https://example.com";
   document.getElementById("inspected-url").textContent = url;
   document.getElementById("hidden-url").value = url;
 
+  /* --- FETCH REPORT DATA --- */
   const fetchReport = () => {
     fetch(`/friendly?url=${encodeURIComponent(url)}`)
       .then(res => res.status === 202 ? setTimeout(fetchReport,3000) : res.json())
@@ -62,6 +131,8 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("waiting-message").style.display='none';
         document.getElementById("score-marker").style.animation='none';
         document.getElementById("score-marker").style.left=data.score+'%';
+        document.getElementById("score-percentage").textContent = data.score + "%";
+
         const render=(id,items,emoji)=>{
           document.getElementById(id).innerHTML=items.map(i=>`<li><div class="title">${emoji} ${i.title}</div><div class="explanation">${i.explanation}</div></li>`).join('');
         };
@@ -72,6 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
   fetchReport();
 
+  /* --- FORM SUBMIT --- */
   document.getElementById('summaryForm').addEventListener('submit',e=>{
     e.preventDefault();
     localStorage.setItem("userName",e.target.name.value);
