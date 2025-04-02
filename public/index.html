@@ -1,148 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>AI SEO Analysis Summary (Powered by ChatGPT)</title>
+  <meta charset="UTF-8" />
+  <title>SnipeRank AI SEO Analysis</title>
   <link href="https://fonts.googleapis.com/css2?family=Forum&family=Nunito+Sans:wght@300;400;700&display=swap" rel="stylesheet">
   <style>
-    /* Global Styles */
-    body { font-family: 'Nunito Sans', sans-serif; background: #f9f9f9; margin: 0; padding: 0; }
-
-    /* HEADER SECTION */
-    header { text-align: center; padding: 15px 20px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    header h2 { font-family: 'Forum', serif; margin: 5px 0; }
-    nav a { margin: 0 10px; text-decoration: none; font-weight: 600; color: #000; }
-
-    /* MAIN CONTAINER */
-    .container { max-width: 700px; margin: 20px auto; padding: 20px 30px; background: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    h1,h2 { font-family: 'Forum', serif; color: #333; }
-
-    /* AI SEO SCORE SECTION */
-    .score-container { display: flex; align-items: center; gap: 10px; margin: 20px 0; }
-    .info-icon { width: 14px; height: 14px; background: #007BFF; color: #fff; border-radius: 50%; text-align: center; cursor: pointer; }
-    .score-indicator-container { width: 50%; position: relative; }
-    .score-indicator { height: 20px; background: linear-gradient(to right, red,yellow,green); border-radius: 10px; }
-    .score-marker { position: absolute; width: 2px; background: black; height: 100%; }
-    .score-percentage { position: absolute; width: 100%; text-align: center; line-height: 20px; }
-
-    /* LIST STYLES */
-    ul { padding: 0; list-style: none; }
-    li { margin-bottom: 10px; }
-    li .title { font-weight: bold; }
-    li .explanation { margin-left: 15px; color: #555; font-size: 0.9em; }
-
-    /* Animated marker while loading */
-@keyframes bounce {
-  0%, 100% { left: 0%; }
-  50% { left: 100%; }
-}
-.loading-animation {
-  animation: bounce 2s infinite;
-}
-
-    /* FORM SECTION */
-    .form-container { width: 75%; margin: auto; margin-top: 20px; }
-    .form-row { display: flex; gap: 10px; margin-bottom: 10px; }
-    .form-row input, button { padding: 8px; width: 100%; box-sizing: border-box; }
-    button { cursor: pointer; }
-    @media (max-width:600px){ .form-row { flex-direction: column; } }
-
-    /* LIGHTBOX */
-    #lightbox { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); }
-    #lightbox-content { background:#fff; padding:20px; margin:100px auto; width:80%; max-width:500px; border-radius:8px; position:relative; }
-    #lightbox-close { position:absolute; top:10px; left:10px; cursor:pointer; }
+    body {
+      font-family: 'Nunito Sans', sans-serif; background: #f9f9f9; margin: 0; padding: 0;
+    }
+    header {
+      text-align: center; padding: 15px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    header h2 { font-family: 'Forum', sans-serif; margin: 5px 0; }
+    nav a {
+      margin: 0 10px; text-decoration: none; font-weight: 600; color: #000;
+    }
+    .container {
+      max-width: 700px; margin: 30px auto; background: #fff; padding: 20px 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    h1, h2 { font-family: 'Forum', sans-serif; color: #333; }
+    .score-indicator {
+      width: 50%; height: 20px; background: linear-gradient(to right, red, yellow, green); border-radius: 10px; position: relative; margin: auto;
+    }
+    .score-marker {
+      width: 2px; background: black; height: 100%; position: absolute; top: 0;
+    }
+    @keyframes bounce {
+      0%, 100% { left: 0%; }
+      50% { left: 100%; }
+    }
+    .loading-animation {
+      animation: bounce 2s infinite;
+    }
+    ul { padding-left: 0; }
+    ul li { margin: 10px 0; list-style: none; }
+    .title { font-weight: bold; }
+    .explanation { font-size: 0.9em; color: #666; }
+    .form-container input { padding: 8px; width: 100%; margin-bottom: 10px; }
+    button { padding: 10px 20px; cursor: pointer; }
   </style>
 </head>
 <body>
-
-<!-- HEADER SECTION -->
 <header>
   <h2>Yoram Ezra Strategies</h2>
   <nav>
-    <a href="/">Home</a>
-    <a href="/ai-seo">AI SEO Analyzer</a>
+    <a href="#">Home</a>
+    <a href="#">AI SEO Analyzer</a>
   </nav>
 </header>
 
-<!-- MAIN CONTENT CONTAINER -->
 <div class="container">
-  <center>
-    <h1>Short AI SEO Analysis<br><small>🤖 Powered by ChatGPT 🤖</small></h1>
-    <p>URL inspected: <strong id="inspected-url">Loading...</strong></p>
-  </center>
-
-  <!-- SCORE SECTION WITH LIGHTBOX -->
-  <div class="score-container">
-    <span class="info-icon" onclick="document.getElementById('lightbox').style.display='block';">?</span>
-    <div><strong>AI SEO Score:</strong></div>
-    <div class="score-indicator-container">
-      <div class="score-indicator">
-        <div class="score-marker" id="score-marker" style="left:0;"></div>
-        <span class="score-percentage" id="score-percentage">Loading...</span>
-      </div>
-    </div>
+  <h1 style="text-align:center;">
+    Short AI SEO Analysis<br>
+    <small style="font-size:0.7em;">🤖 Powered by ChatGPT 🤖</small>
+  </h1>
+  <div class="header-info" style="text-align:center;">
+    <p>URL inspected: <strong id="inspected-url">Loading URL...</strong></p>
+    <p id="waiting-message">Please wait while SnipeRank is building the report...</p>
   </div>
 
-  <!-- Superpowers SECTION -->
-  <h2>Superpowers</h2>
+  <div class="score-indicator">
+    <div id="score-marker" class="score-marker loading-animation"></div>
+  </div>
+  <p id="score-percentage" style="text-align:center;">--%</p>
+
+  <h2>Your Site's Superpowers</h2>
   <ul id="superpowers-list"><li>Loading...</li></ul>
 
-  <!-- Opportunities SECTION -->
-  <h2>Opportunities for Improvement</h2>
+  <h2>Opportunities for an AI Boost</h2>
   <ul id="opportunities-list"><li>Loading...</li></ul>
 
-  <!-- AI Engine Insights SECTION -->
   <h2>AI Engine Insights</h2>
   <ul id="engine-insights-list"><li>Loading...</li></ul>
 
-  <!-- FORM SECTION -->
   <div class="form-container">
-    <p>To receive your full detailed AI SEO report, please provide your details:</p>
+    <p>To receive your full, detailed AI SEO report, please provide your information below:</p>
     <form action="/detailed" method="POST">
-      <input type="hidden" name="url" id="hidden-url">
-      <div class="form-row">
-        <input type="text" name="name" placeholder="Name*" required>
-        <input type="email" name="email" placeholder="Email*" required>
-      </div>
-      <div class="form-row">
-        <input type="text" name="company" placeholder="Company/Organization">
-      </div>
+      <input type="hidden" name="url" id="hidden-url" value="">
+      <input type="text" name="name" placeholder="Name*" required>
+      <input type="email" name="email" placeholder="Email*" required>
+      <input type="text" name="company" placeholder="Company/Organization">
       <button type="submit">Get Full Report</button>
     </form>
   </div>
 </div>
 
-<!-- LIGHTBOX CONTENT -->
-<div id="lightbox">
-  <div id="lightbox-content">
-    <span id="lightbox-close" onclick="document.getElementById('lightbox').style.display='none';">Close [X]</span>
-    <h2>AI SEO Score Explained</h2>
-    <p>Score explanation content goes here...</p>
-  </div>
-</div>
-
-<!-- SCRIPT TO LOAD DYNAMIC DATA -->
-<!-- SCRIPT TO LOAD DYNAMIC DATA -->
 <script>
 document.addEventListener("DOMContentLoaded", function () {
   const url = new URLSearchParams(window.location.search).get("url") || "https://example.com";
   document.getElementById("inspected-url").textContent = url;
-
-  // Insert waiting message
-  const headerInfo = document.querySelector('.header-info');
-  const waitMsg = document.createElement('p');
-  waitMsg.textContent = "Please wait while SnipeRank is building the report...";
-  waitMsg.id = "waiting-message";
-  headerInfo.appendChild(waitMsg);
+  document.getElementById("hidden-url").value = url;
 
   const marker = document.getElementById("score-marker");
-  marker.classList.add("loading-animation");
 
   const fetchReport = () => {
     fetch("/friendly?url=" + encodeURIComponent(url))
       .then(res => {
         if (res.status === 202) {
-          setTimeout(fetchReport, 3000); // recheck every 3 seconds
+          setTimeout(fetchReport, 3000);
           return null;
         }
         return res.json();
@@ -150,12 +105,10 @@ document.addEventListener("DOMContentLoaded", function () {
       .then(data => {
         if (!data) return;
 
-        // Remove waiting message
-        document.getElementById("waiting-message").remove();
+        document.getElementById("waiting-message").style.display = 'none';
         marker.classList.remove("loading-animation");
-
-        document.getElementById("score-percentage").textContent = data.score + "%";
         marker.style.left = data.score + "%";
+        document.getElementById("score-percentage").textContent = data.score + "%";
 
         const renderList = (id, items, emoji) => {
           const list = document.getElementById(id);
