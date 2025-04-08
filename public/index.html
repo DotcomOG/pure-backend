@@ -97,7 +97,7 @@
     /* URL Entry Lightbox */
     #url-lightbox {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.8); display: flex; justify-content: center; align-items: center; z-index: 20000;
+      background: #000; display: flex; justify-content: center; align-items: center; z-index: 20000;
     }
     .lightbox-content {
       background: white; padding: 25px; border-radius: 10px; text-align: center;
@@ -128,15 +128,19 @@
 <body>
 
   <!-- URL Entry Lightbox -->
-<div class="lightbox-content">
-  <h2 style="margin-top: 0;">SnipeRank</h2>
-  <p style="margin-bottom: 20px;">
-    SnipeRank is your AI-powered SEO assistant.<br>
-    Enter any website URL to instantly generate a smart, AI-driven SEO report.
-  </p>
-  <input type="text" id="urlInput" placeholder="Enter website URL" required>
-  <button id="analyzeButton">Analyze</button>
+<div id="url-lightbox">
+  <div class="lightbox-content">
+    <p style="margin-bottom: 20px; font-size: 0.95em; color: #333;">
+    <h2 style="margin-top: 0;">SnipeRank</h2>
+    <p style="margin-bottom: 20px;">
+      SnipeRank is your AI-powered SEO assistant.<br>
+      Enter any website URL to instantly generate a smart, AI-driven SEO report.
+    </p>
+    <input type="text" id="urlInput" placeholder="Enter website URL" required>
+    <button id="analyzeButton">Analyze</button>
+  </div>
 </div>
+
 
   <header><h2>Yoram Ezra Strategies</h2></header>
   <div class="container">
