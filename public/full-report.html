@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,6 +16,13 @@
     li { margin-bottom:10px; }
     .title { font-weight:bold; }
     .explanation { font-size:0.9em; color:#666; }
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+    
   </style>
 
   <!-- Firebase SDK -->
@@ -82,40 +90,51 @@
 <!-- Updated Contact Form at the bottom of your full-report.html -->
 <div class="form-container" style="width:80%; margin:30px auto; background:#f0f8ff; padding:15px; border-radius:8px;">
   <h3 style="text-align:center;">Let's Talk About Your Report</h3>
+  <div class="form-container" style="width:75%; margin:auto; text-align:center; padding-top:30px;">
   <form id="contactForm">
     <input type="hidden" id="hidden-url" value="">
 
-    <!-- Name and Email -->
-    <div class="form-row">
-      <input type="text" name="name" placeholder="Your Name*" required>
-      <input type="email" name="email" placeholder="Your Email*" required>
+    <div class="form-row" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:10px;">
+      <input type="text" name="name" placeholder="Your Name*" required style="padding:8px; flex:1; min-width:150px;">
+      <input type="email" name="email" placeholder="Your Email*" required style="padding:8px; flex:1; min-width:150px;">
     </div>
 
-    <!-- Company and Position -->
-    <div class="form-row">
-      <input type="text" name="company" placeholder="Company/Organization">
-      <input type="text" name="position" placeholder="Position or Role">
+    <div class="form-row" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:10px;">
+      <input type="text" name="company" placeholder="Company/Organization (optional)" style="padding:8px; flex:1; min-width:150px;">
     </div>
 
-    <!-- Phone and Best Time to Contact -->
-    <div class="form-row">
-      <input type="tel" name="phone" placeholder="Phone Number">
-      <select name="bestTime">
-        <option value="">Best Time to Contact</option>
+    <button type="submit" style="padding:10px 20px; cursor:pointer;">Submit</button>
+  </form>
+<div class="form-container" style="width:75%; margin:auto; text-align:center; padding-top:30px;">
+  <form id="contactForm">
+    <input type="hidden" id="hidden-url" value="">
+
+    <!-- Row 1: Name and Email -->
+    <div class="form-row" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:10px;">
+      <input type="text" name="name" placeholder="Your Name*" required style="padding:8px; flex:1; min-width:150px;">
+      <input type="email" name="email" placeholder="Your Email*" required style="padding:8px; flex:1; min-width:150px;">
+    </div>
+
+    <!-- Row 2: Company and Website -->
+    <div class="form-row" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:10px;">
+      <input type="text" name="company" placeholder="Company/Organization" style="padding:8px; flex:1; min-width:150px;">
+      <input type="text" name="websiteURL" id="websiteURL" placeholder="Website URL" readonly style="padding:8px; flex:1; min-width:150px;">
+    </div>
+
+    <!-- Row 3: Phone and Best Time -->
+    <div class="form-row" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:10px;">
+      <input type="tel" name="phone" placeholder="Phone Number" style="padding:8px; flex:1; min-width:150px;">
+      <select name="bestTime" style="padding:8px; flex:1; min-width:150px;">
+        <option value="">Best Time to Call</option>
         <option>Morning</option>
         <option>Afternoon</option>
         <option>Evening</option>
       </select>
     </div>
 
-    <!-- Website URL (auto-filled and readonly) -->
-    <div class="form-row">
-      <input type="text" name="websiteURL" id="websiteURL" value="" readonly>
-    </div>
-
-    <!-- Submit Button -->
-    <button type="submit">Submit & Schedule Call</button>
+    <button type="submit" style="padding:10px 20px; cursor:pointer;">Submit & Schedule Call</button>
   </form>
+</div>
 </div>
 
 <script>
@@ -131,7 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
       name: e.target.name.value,
       email: e.target.email.value,
       company: e.target.company.value,
-      position: e.target.position.value,
+      position: "", // if not collected
       phone: e.target.phone.value,
       bestTime: e.target.bestTime.value,
       websiteURL: url
