@@ -1,0 +1,13 @@
+{
+  "name": "ai-seo-clean",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "tailwindcss -i ./src/input.css -o ./public/style.css --minify"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.1",
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.21"
+  }
+}
+

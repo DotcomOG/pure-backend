@@ -1,0 +1,23 @@
+<!-- Last updated: 2025-04-20 16:00 ET -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Form Page</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 600px;
+      margin: 2rem auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Full Form Page</h1>
+  <p>This is where your full form or full report will go.</p>
+  <script>
+    const url = localStorage.getItem("targetURL");
+    document.body.insertAdjacentHTML("beforeend", `<p>URL received: <strong>${url}</strong></p>`);
+  </script>
+</body>
+</html>

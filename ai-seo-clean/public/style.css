@@ -1,0 +1,165 @@
+/* Last updated: 2025-04-22 11:55 ET */
+body {
+  font-family: 'Nunito Sans', sans-serif;
+  background: #f9f9f9;
+  margin: 0;
+  padding: 0;
+}
+header {
+  text-align: center;
+  padding: 15px;
+  background: #fff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.container {
+  max-width: 700px;
+  margin: 30px auto;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+h1, h2 {
+  font-family: 'Forum', serif;
+  color: #333;
+  text-align: center;
+}
+ul {
+  padding: 0;
+  list-style: none;
+}
+li {
+  margin-bottom: 10px;
+}
+.title {
+  font-weight: bold;
+}
+.explanation {
+  font-size: 0.9em;
+  color: #555;
+}
+#waiting-message {
+  text-align: center;
+  font-style: italic;
+  margin-bottom: 20px;
+}
+.score-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 10px 0 20px;
+}
+.info-icon {
+  cursor: pointer;
+  font-weight: bold;
+  background: #007BFF;
+  color: #fff;
+  padding: 3px 8px;
+  border-radius: 50%;
+  font-size: 12px;
+}
+.score-indicator {
+  position: relative;
+  width: 50%;
+  height: 20px;
+  background: linear-gradient(to right, red, yellow, green);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.score-marker {
+  position: absolute;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  background: #000;
+}
+.score-percentage {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  text-align: center;
+  line-height: 20px;
+  font-size: 0.9em;
+  color: #000;
+  pointer-events: none;
+}
+@keyframes bounce {
+  0%, 100% { left: 0%; }
+  50% { left: 100%; }
+}
+.form-container {
+  width: 75%;
+  margin: 30px auto;
+  text-align: center;
+}
+.form-container input,
+.form-container button {
+  width: 100%;
+  max-width: 400px;
+  padding: 8px;
+  margin-bottom: 10px;
+  font-size: 1em;
+}
+.form-container button {
+  background: #007BFF;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+#url-lightbox {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 20000;
+}
+.lightbox-content {
+  position: relative;
+  background: #fff;
+  padding: 25px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+.lightbox-content input,
+.lightbox-content button {
+  width: 90%;
+  max-width: 400px;
+  margin: 10px 0;
+  padding: 12px;
+  font-size: 16px;
+}
+.lightbox-content button {
+  background: #007BFF;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+}
+.lightbox-content button:hover {
+  background: #0056b3;
+}
+#score-lightbox {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.8);
+  justify-content: center;
+  align-items: center;
+  z-index: 25000;
+}
+#score-lightbox .lightbox-content {
+  width: 50%;
+  max-width: 600px;
+}
+#score-lightbox-close {
+  position: absolute;
+  top: 10px; right: 15px;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+}

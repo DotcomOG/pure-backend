@@ -1,0 +1,214 @@
+<!-- Last updated: 2025-04-22 14:50 ET -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SnipeRank AI‑SEO Summary Report</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Forum&family=Nunito+Sans:wght@300;400;700&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <style>
+    body { font-family:'Nunito Sans',sans-serif; background:#f9f9f9; margin:0; padding:0 }
+    header { text-align:center; padding:15px; background:#fff; box-shadow:0 2px 5px rgba(0,0,0,0.1) }
+    .container { max-width:700px; margin:30px auto; background:#fff; padding:20px; border-radius:8px }
+    h1,h2 { font-family:'Forum',serif; color:#333; text-align:center }
+
+    /* Lightbox */
+    #url-lightbox { position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:1000 }
+    .lightbox-content { background:#fff;padding:24px;border-radius:8px;text-align:center;max-width:90% }
+    .lightbox-content input,
+    .lightbox-content button { width:90%;max-width:360px;padding:10px;margin:10px 0;font-size:1em }
+    .lightbox-content button { background:#007BFF;color:#fff;border:none;border-radius:4px;cursor:pointer }
+    .lightbox-content button:hover { background:#0056b3 }
+
+    /* Score Lightbox */
+    #score-lightbox { position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:none;align-items:center;justify-content:center;z-index:2000 }
+    #score-lightbox .lightbox-content { background:#fff;padding:24px;border-radius:8px;position:relative;max-width:90%;text-align:left }
+    #score-lightbox-close { position:absolute;top:8px;right:12px;font-size:20px;cursor:pointer;background:none;border:none;color:#000 }
+
+    .error-message { color:red;text-align:center;margin:10px 0 }
+    #waiting-message { display:none;text-align:center;font-style:italic;margin:10px 0 }
+
+    .score-container { display:flex;align-items:center;justify-content:center;gap:8px;margin:16px 0 }
+    .info-icon { cursor:pointer;background:#007BFF;color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:12px }
+    .score-indicator { position:relative;width:50%;height:20px;background:linear-gradient(to right, red,yellow,green);border-radius:10px;overflow:hidden }
+    .score-marker { position:absolute;top:0;left:0;width:2px;height:100%;background:#000;animation:bounce 2s infinite ease-in-out }
+    .score-percentage { position:absolute;top:0;left:0;width:100%;line-height:20px;text-align:center;font-size:0.9em;color:#000 }
+    @keyframes bounce { 0%,100% { left:0 } 50% { left:100% } }
+
+    ul { padding:0;list-style:none }
+    li { margin:8px 0 }
+    .title { font-weight:bold }
+    .explanation { font-size:0.9em;color:#555 }
+
+    .form-container { width:80%;max-width:400px;margin:24px auto;text-align:center }
+    .form-container input,
+    .form-container button { width:100%;padding:8px;margin:6px 0;font-size:1em }
+    .form-container button { background:#007BFF;color:#fff;border:none;cursor:pointer }
+  </style>
+</head>
+<body>
+
+  <!-- URL Entry Lightbox -->
+  <div id="url-lightbox">
+    <div class="lightbox-content">
+      <h2>SnipeRank</h2>
+      <p>Enter any website URL to get an AI‑SEO summary.</p>
+      <input type="text" id="urlInput" placeholder="example.com or https://example.com">
+      <button id="analyzeButton">Analyze</button>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header><h2>Yoram Ezra Strategies</h2></header>
+
+  <!-- Summary Container -->
+  <div class="container">
+    <h1>Summary Report</h1>
+    <p>URL inspected: <strong id="inspected-url">Waiting…</strong></p>
+    <p id="waiting-message">Scanning… this can take up to a minute.</p>
+    <p class="error-message" id="errorMsg"></p>
+
+    <!-- Score -->
+    <div class="score-container">
+      <div class="info-icon" id="infoIcon">?</div>
+      <div>Score:</div>
+      <div class="score-indicator">
+        <div id="score-marker" class="score-marker"></div>
+        <div id="score-percentage" class="score-percentage">0%</div>
+      </div>
+    </div>
+
+    <!-- Superpowers -->
+    <h2>Superpowers (✔️ up to 5)</h2>
+    <ul id="superpowers-list"></ul>
+
+    <!-- Opportunities -->
+    <h2>Opportunities (🚨 up to 10)</h2>
+    <ul id="opportunities-list"></ul>
+
+    <!-- AI Engine Insights -->
+    <h2>AI Engine Insights (🤖)</h2>
+    <ul id="engine-insights-list"></ul>
+
+    <!-- Contact Form -->
+    <div class="form-container">
+      <form id="summaryForm">
+        <input type="text" name="name" placeholder="Your Name*" required>
+        <input type="email" name="email" placeholder="Your Email*" required>
+        <input type="text" name="company" placeholder="Company / Org (optional)">
+        <button type="submit">Get Full Report</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Score Explanation Lightbox -->
+  <div id="score-lightbox">
+    <div class="lightbox-content">
+      <button id="score-lightbox-close">&times;</button>
+      <h2>Score Explained</h2>
+      <ul>
+        <li><strong>0–20:</strong> Critical AI‑SEO issues</li>
+        <li><strong>21–40:</strong> Severe AI‑SEO issues</li>
+        <li><strong>41–60:</strong> Moderate AI‑SEO issues</li>
+        <li><strong>61–80:</strong> Minor AI‑SEO issues</li>
+        <li><strong>81–100:</strong> Excellent AI‑SEO health</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Main Script -->
+  <script>
+    // Ensure you include both protocol and trailing slash
+    const BACKEND_URL = 'https://ai-seo-backend-final.onrender.com/';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      let summaryData;
+      const ui = {
+        urlBox:      document.getElementById('url-lightbox'),
+        urlInput:    document.getElementById('urlInput'),
+        analyzeBtn:  document.getElementById('analyzeButton'),
+        waitingMsg:  document.getElementById('waiting-message'),
+        inspected:   document.getElementById('inspected-url'),
+        errorMsg:    document.getElementById('errorMsg'),
+        scoreMkr:    document.getElementById('score-marker'),
+        scorePct:    document.getElementById('score-percentage'),
+        superList:   document.getElementById('superpowers-list'),
+        oppList:     document.getElementById('opportunities-list'),
+        insightList: document.getElementById('engine-insights-list'),
+        summaryForm: document.getElementById('summaryForm'),
+        infoIcon:    document.getElementById('infoIcon'),
+        scoreBox:    document.getElementById('score-lightbox'),
+        scoreClose:  document.getElementById('score-lightbox-close')
+      };
+
+      function renderSummary() {
+        ui.waitingMsg.style.display = 'none';
+        ui.scoreMkr.style.animation = 'none';
+        ui.scoreMkr.style.left      = summaryData.score + '%';
+        ui.scorePct.textContent     = summaryData.score + '%';
+
+        ui.superList.innerHTML = summaryData.ai_superpowers
+          .map(i => `<li><div class="title">✅ ${i.title}</div><div class="explanation">${i.explanation}</div></li>`)
+          .join('');
+
+        ui.oppList.innerHTML = summaryData.ai_opportunities
+          .map(i => `<li><div class="title">🚨 ${i.title}</div><div class="explanation">${i.explanation}</div></li>`)
+          .join('');
+
+        ui.insightList.innerHTML = Object.entries(summaryData.ai_engine_insights)
+          .map(([eng, txt]) => `<li><div class="title">🤖 ${eng}</div><div class="explanation">${txt}</div></li>`)
+          .join('');
+      }
+
+      async function analyzeURL() {
+        ui.errorMsg.textContent = '';
+        ui.waitingMsg.style.display = 'block';
+        const raw = ui.urlInput.value.trim();
+        if (!raw) {
+          ui.errorMsg.textContent = 'Please enter a URL.';
+          ui.waitingMsg.style.display = 'none';
+          return;
+        }
+        const url = /^(https?:\/\/)/i.test(raw) ? raw : 'https://' + raw;
+        ui.inspected.textContent = url;
+        ui.urlBox.style.display = 'none';
+
+        const endpoint = `${BACKEND_URL}friendly?type=summary&url=${encodeURIComponent(url)}`;
+        console.log('Fetching:', endpoint);
+
+        try {
+          const res = await fetch(endpoint, { mode: 'cors', redirect: 'follow' });
+          console.log('Status:', res.status);
+          if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.detail || `Server ${res.status}`);
+          }
+          summaryData = await res.json();
+          renderSummary();
+        } catch (err) {
+          ui.waitingMsg.style.display = 'none';
+          ui.errorMsg.textContent = `Error fetching summary: ${err.message}`;
+          console.error(err);
+        }
+      }
+
+      ui.analyzeBtn.addEventListener('click', analyzeURL);
+      ui.urlInput.addEventListener('keydown', e => { if (e.key==='Enter') analyzeURL(); });
+
+      ui.summaryForm.addEventListener('submit', e => {
+        e.preventDefault();
+        localStorage.setItem('userName', e.target.name.value.trim());
+        localStorage.setItem('userEmail', e.target.email.value.trim());
+        localStorage.setItem('userCompany', e.target.company.value.trim());
+        window.location.href = `/public/full-report.html?url=${encodeURIComponent(ui.inspected.textContent)}`;
+      });
+
+      ui.infoIcon.addEventListener('click', () => ui.scoreBox.style.display = 'flex');
+      ui.scoreClose.addEventListener('click', () => ui.scoreBox.style.display = 'none');
+    });
+  </script>
+</body>
+</html>
