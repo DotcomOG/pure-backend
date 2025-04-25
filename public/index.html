@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI-SEO Analyzer</title>
+  <style>
+    body { font-family: Helvetica, sans-serif; padding: 2em; }
+    input, button { font-family: Helvetica, sans-serif; }
+  </style>
+</head>
+<body>
+  <form id="url-form">
+    <input id="url-input" placeholder="Enter URL…" />
+    <button type="submit">Analyze</button>
+  </form>
+
+  <h2>Score: <span id="score">N/A</span></h2>
+  <h3>Superpowers</h3>
+  <ul id="superpowers"></ul>
+  <h3>Opportunities</h3>
+  <ul id="opportunities"></ul>
+  <pre id="raw-json" style="background:#f9f9f9;padding:1em;overflow:auto;"></pre>
+
+  <script src="/index.js"></script>
+</body>
+</html>
