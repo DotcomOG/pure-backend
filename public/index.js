@@ -1,33 +1,43 @@
-// public/index.js
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('url-form');
   const input = document.getElementById('url-input');
   const scoreEl = document.getElementById('score');
-  const supEl = document.getElementById('superpowers');
+  const superEl = document.getElementById('superpowers');
   const oppEl = document.getElementById('opportunities');
   const rawEl = document.getElementById('raw-json');
 
   form.addEventListener('submit', async e => {
     e.preventDefault();
-    const url = encodeURIComponent(input.value.trim());
-    const res = await fetch(`/friendly?type=summary&url=${url}`);
-    const json = await res.json();
-    scoreEl.textContent = json.score ?? 'N/A';
-
-    supEl.innerHTML = '';
-    (json.ai_superpowers || []).forEach(s => {
-      const li = document.createElement('li');
-      li.innerHTML = `<strong>${s.title}</strong>: ${s.explanation}`;
-      supEl.append(li);
-    });
-
+    const url = encodeURIComponent(input.value);
+    scoreEl.textContent = 'Loading…';
+    superEl.innerHTML = '';
     oppEl.innerHTML = '';
-    (json.ai_opportunities || []).forEach(o => {
-      const li = document.createElement('li');
-      li.innerHTML = `<strong>${o.title}</strong>: ${o.explanation}`;
-      oppEl.append(li);
-    });
+    rawEl.textContent = '';
 
-    rawEl.textContent = JSON.stringify(json, null, 2);
+    try {
+      const res = await fetch(`/friendly?type=summary&url=${url}`);
+      const data = await res.json();
+
+      if (data.error) throw new Error(data.detail);
+
+      scoreEl.textContent = data.score ?? 'N/A';
+
+      (data.ai_superpowers || []).forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = `${item.title}: ${item.explanation}`;
+        superEl.appendChild(li);
+      });
+
+      (data.ai_opportunities || []).forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = `${item.title}: ${item.explanation}`;
+        oppEl.appendChild(li);
+      });
+
+      rawEl.textContent = JSON.stringify(data, null, 2);
+    } catch (err) {
+      scoreEl.textContent = 'Error';
+      rawEl.textContent = err.message;
+    }
   });
 });

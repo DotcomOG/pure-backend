@@ -1,26 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>AI-SEO Analyzer</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI SEO Analyzer</title>
   <style>
-    body { font-family: Helvetica, sans-serif; padding: 2em; }
-    input, button { font-family: Helvetica, sans-serif; }
+    body { font-family: Helvetica, sans-serif; margin: 2em; }
+    #raw-json { background: #f9f9f9; padding: 1em; overflow: auto; white-space: pre-wrap; }
+    .section { margin-top: 1.5em; }
+    .section h2 { margin-bottom: 0.5em; }
   </style>
 </head>
 <body>
   <form id="url-form">
-    <input id="url-input" placeholder="Enter URL…" />
+    <input id="url-input" placeholder="Enter URL…" size="50"/>
     <button type="submit">Analyze</button>
   </form>
 
-  <h2>Score: <span id="score">N/A</span></h2>
-  <h3>Superpowers</h3>
-  <ul id="superpowers"></ul>
-  <h3>Opportunities</h3>
-  <ul id="opportunities"></ul>
-  <pre id="raw-json" style="background:#f9f9f9;padding:1em;overflow:auto;"></pre>
+  <div class="section">
+    <strong>Score:</strong> <span id="score">N/A</span>
+  </div>
+  <div class="section">
+    <h2>AI Superpowers</h2>
+    <ul id="superpowers"></ul>
+  </div>
+  <div class="section">
+    <h2>AI Opportunities</h2>
+    <ul id="opportunities"></ul>
+  </div>
+  <div class="section">
+    <h2>Raw JSON</h2>
+    <pre id="raw-json"></pre>
+  </div>
 
-  <script src="/index.js"></script>
+  <script src="/public/index.js"></script>
 </body>
 </html>
